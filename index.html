@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Progressive Web App (PWA) & Mobile Meta Tags -->
+    <meta name="theme-color" content="#FFD500">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Hemzal Staff">
+    <link id="manifest-link" rel="manifest">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FFEAEA'/><path d='M50 20C35 20 28 35 28 50C28 65 40 75 55 75C68 75 75 62 75 50' stroke='%23d1232a' stroke-width='7'/></svg>">
+    
     <title>Hemzal Staff Portal</title>
     <!-- FontAwesome 6 & jsPDF -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,6 +28,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -96,6 +106,26 @@
             transform: translateY(0);
         }
 
+        /* Dynamic PWA Install Banner Button */
+        .btn-pwa-install {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #1e1e1e;
+            color: #FFD500;
+            border: 2px solid #FFD500;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            margin-top: 10px;
+            transition: transform 0.2s ease;
+        }
+        .btn-pwa-install:active { transform: scale(0.95); }
+
         /* ==================== 1. LOGIN & SIGNUP SCREEN ==================== */
         #login-screen, #signup-screen {
             justify-content: center;
@@ -105,16 +135,19 @@
 
         .brand-container {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             animation: bounceIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .logo-placeholder {
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             background: #fff;
             border-radius: 35px;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 12px auto;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -275,7 +308,7 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             border: 2px solid transparent;
             transition: all 0.3s ease;
         }
@@ -345,6 +378,17 @@
             color: #888;
             text-align: center;
             margin-top: -6px;
+        }
+
+        .shift-rules-subtext {
+            font-size: 10px;
+            font-weight: 700;
+            color: #854d0e;
+            background-color: #fef9c3;
+            padding: 5px 8px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #fef08a;
         }
 
         .btn-clock {
@@ -1237,19 +1281,14 @@
             <div class="brand-container">
                 <div class="logo-placeholder">
                     <img src="hemzal-logo.png" width="150">
-                    <!-- <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="45" fill="#FFEAEA" />
-                        <path d="M50 20C35 20 28 35 28 50C28 65 40 75 55 75C68 75 75 62 75 50" stroke="#d1232a" stroke-width="7" stroke-linecap="round"/>
-                        <path d="M38 42C38 40 42 38 44 42" stroke="#d1232a" stroke-width="4" stroke-linecap="round"/>
-                        <path d="M56 42C56 40 60 38 62 42" stroke="#d1232a" stroke-width="4" stroke-linecap="round"/>
-                        <path d="M42 55Q50 64 58 55" stroke="#E61C24" stroke-width="5" stroke-linecap="round"/>
-                        <circle cx="28" cy="22" r="6" fill="#FFD500"/>
-                        <circle cx="74" cy="26" r="4" fill="#FFD500"/>
-                        <circle cx="70" cy="68" r="8" fill="#FFD500"/>
-                    </svg> -->
                 </div>
                 <h1 class="brand-name">Hemzal Crispy</h1>
                 <p class="brand-subtitle">INTERNAL STAFF PORTAL</p>
+                
+                <button id="pwa-install-btn" class="btn-pwa-install" onclick="triggerAppInstall()">
+                    <i class="fa-solid fa-download"></i> Install App to Phone
+                </button>
+
                 <div id="db-status-tag" class="db-status-pill offline">
                     <i class="fa-solid fa-database"></i> <span id="db-status-text">RTDB Ready</span>
                 </div>
@@ -1335,6 +1374,11 @@
                     </div>
                     <div id="live-time" class="time-display">00:00:00 PM</div>
                     <div id="live-date" class="date-display">Monday, Jan 01, 2026</div>
+                    
+                    <div class="shift-rules-subtext">
+                        <i class="fa-solid fa-circle-info"></i> Shift: 8:00 AM – 8:00 PM | Late after 9:30 AM | OT @ RM10/hr after 8:00 PM
+                    </div>
+
                     <button id="clock-btn" class="btn-clock" onclick="toggleShiftClock()">Clock In Entry</button>
                 </div>
 
@@ -1551,7 +1595,7 @@
                         <i class="fa-solid fa-wallet"></i>
                     </div>
                     <div id="profile-accrued-amount" class="payroll-amount">RM 2,482.50</div>
-                    <p class="payroll-sub-text">Calculations based on 154 hours logged + 12 hours overtime premium for the ongoing calendar payout timeline windows.</p>
+                    <p class="payroll-sub-text">Calculations based on 154 hours logged + OT premium (RM10/hr after 8PM) for the ongoing calendar payout timeline windows.</p>
                 </div>
 
                 <button class="btn-logout" onclick="performLogOut()"><i class="fa-solid fa-power-off"></i> Disconnect Session</button>
@@ -1588,7 +1632,7 @@
                     
                     <span class="payslip-sec-title">Incomes / Base Additions</span>
                     <div class="payslip-row"><span>Regular Hours (160h x RM14.50)</span><span>RM 2,320.00</span></div>
-                    <div class="payslip-row"><span id="payslip-ot-label">Overtime Hours (8h x RM21.75)</span><span id="payslip-ot-val">RM 174.00</span></div>
+                    <div class="payslip-row"><span id="payslip-ot-label">Overtime Hours (8h x RM10.00)</span><span id="payslip-ot-val">RM 80.00</span></div>
                     <div class="payslip-row"><span>Performance Allowance Incentive</span><span>RM 200.00</span></div>
 
                     <span class="payslip-sec-title" style="margin-top: 5px;">Statutory Deductions</span>
@@ -1598,7 +1642,7 @@
 
                     <div class="payslip-total-row">
                         <span>Net Take-home Payout</span>
-                        <span class="payslip-total-amount" id="payslip-net-amount">RM 2,402.51</span>
+                        <span class="payslip-total-amount" id="payslip-net-amount">RM 2,308.51</span>
                     </div>
 
                     <button class="btn-payslip-action" onclick="generatePayslipPDF()"><i class="fa-solid fa-file-pdf"></i> Download Document Slip</button>
@@ -1614,7 +1658,7 @@
                             </div>
                             <span class="payslip-history-amount">RM 2,510.40</span>
                         </div>
-                        <div class="phone-container-row payslip-history-row" onclick="selectArchivedPayslipIndex('February 2026')">
+                        <div class="payslip-history-row" onclick="selectArchivedPayslipIndex('February 2026')">
                             <div class="payslip-history-info">
                                 <span class="payslip-history-month">February 2026 Settlement</span>
                                 <span class="payslip-history-status">Transferred</span>
@@ -1637,9 +1681,67 @@
     </div>
 
     <script>
+        /* ==================== PWA SETUP & SERVICE WORKER INJECTION ==================== */
+        function initPWAEngine() {
+            // Dynamic Manifest Data URI setup
+            const manifestObj = {
+                name: "Hemzal Staff Portal",
+                short_name: "Hemzal Staff",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#FFD500",
+                theme_color: "#d1232a",
+                description: "Hemzal Crispy Chicken Staff Portal",
+                icons: [
+                    {
+                        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FFEAEA'/><path d='M50 20C35 20 28 35 28 50C28 65 40 75 55 75C68 75 75 62 75 50' stroke='%23d1232a' stroke-width='7'/></svg>",
+                        sizes: "192x192 512x512",
+                        type: "image/svg+xml"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+            document.getElementById('manifest-link').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+            // Dynamic Service Worker Blob Registration
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW reg error:', err));
+            }
+        }
+
+        let deferredPWAInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPWAInstallPrompt = e;
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) installBtn.style.display = 'inline-flex';
+        });
+
+        function triggerAppInstall() {
+            if (deferredPWAInstallPrompt) {
+                deferredPWAInstallPrompt.prompt();
+                deferredPWAInstallPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        showToast('App installed on your device!', true);
+                    }
+                    deferredPWAInstallPrompt = null;
+                    document.getElementById('pwa-install-btn').style.display = 'none';
+                });
+            } else {
+                showToast('To install: Tap browser menu & select "Add to Home Screen"', true);
+            }
+        }
+
         /* ==================== FIREBASE REALTIME DATABASE INITIALIZATION ==================== */
-        // Replace the placeholder values below with your Firebase Project Settings
-          const firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyCe70Ka3LStm2Gc1ivAIG9WUXb-uIeeMwQ",
             authDomain: "babah-staff-portal.firebaseapp.com",
             databaseURL: "https://babah-staff-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -1668,7 +1770,7 @@
                     }
                     console.log("Firebase Realtime Database initialized and ready.");
                 } else {
-                    console.info("Firebase Realtime Database operating in local memory fallback mode. Replace firebaseConfig keys with your Firebase project configuration to sync live.");
+                    console.info("Firebase Realtime Database operating in local memory fallback mode.");
                 }
             } catch (e) {
                 console.error("Firebase Initialization Error:", e);
@@ -1755,7 +1857,7 @@
             }
 
             toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
 
         /* ==================== REALTIME DATABASE SYNC LISTENERS ==================== */
@@ -1781,6 +1883,7 @@
                     if (activeShift) {
                         isClockedIn = true;
                         activeShiftKey = activeShift.id;
+                        punchInTime = new Date(activeShift.timestamp);
                         updateClockUIState(true);
                     } else {
                         isClockedIn = false;
@@ -1887,7 +1990,6 @@
                         activeStaffName = userData.name || userVal;
                         completeLoginUI();
                     } else {
-                        // Fallback to mock check
                         const matchedUser = mockUsers.find(u => u.username === userVal && u.password === passVal);
                         if (matchedUser) {
                             activeUsername = matchedUser.username;
@@ -1963,12 +2065,17 @@
 
             shiftLogsArray.forEach(item => {
                 const row = document.createElement('div');
-                row.className = `shift-row ${item.active ? 'active-shift' : ''} ${item.late && !item.active ? 'late-shift' : ''}`;
+                row.className = `shift-row ${item.active ? 'active-shift' : ''} ${item.late ? 'late-shift' : ''}`;
                 
                 let badgeClass = "completed";
                 let badgeText = "Finished";
-                if (item.active) { badgeClass = "active"; badgeText = "On-Duty"; }
-                else if (item.late) { badgeClass = "late"; badgeText = "Tardy"; }
+                if (item.active) { 
+                    badgeClass = "active"; 
+                    badgeText = item.late ? "On-Duty (Late)" : "On-Duty"; 
+                } else if (item.late) { 
+                    badgeClass = "late"; 
+                    badgeText = "Late Punch"; 
+                }
 
                 row.innerHTML = `
                     <div class="shift-info-left">
@@ -2006,6 +2113,12 @@
             }
         }
 
+        /*
+            UPDATED SHIFT RULES IMPLEMENTATION:
+            1. Punch once per day, starting 8:00 AM until 8:00 PM.
+            2. Punch in AFTER 9:30 AM is LATE.
+            3. Punch out AFTER 8:00 PM calculates OT @ RM10/hour.
+        */
         function toggleShiftClock() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -2014,6 +2127,27 @@
             const safeUserKey = activeUsername.replace(/[.#$/[\]]/g, '_');
 
             if (!isClockedIn) {
+                // RULE 1: Punch once per day limit check
+                const todayShift = shiftLogsArray.find(s => s.date === todayStr);
+                if (todayShift && !todayShift.active) {
+                    showToast("Only 1 shift punch allowed per day! Already completed today.", false);
+                    return;
+                }
+
+                // RULE 1: Time Window Check (8:00 AM - 8:00 PM)
+                const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                const startWindow = 8 * 60;   // 8:00 AM = 480 mins
+                const endWindow = 20 * 60;    // 8:00 PM = 1200 mins
+
+                if (currentMinutes < startWindow || currentMinutes > endWindow) {
+                    showToast("Clock-in is only permitted between 8:00 AM and 8:00 PM.", false);
+                    return;
+                }
+
+                // RULE 2: Late check (> 9:30 AM = 570 mins)
+                const lateThreshold = 9 * 60 + 30; 
+                const isLate = currentMinutes > lateThreshold;
+
                 isClockedIn = true;
                 punchInTime = now;
                 updateClockUIState(true);
@@ -2024,7 +2158,7 @@
                     out: null,
                     duration: "0h 0m",
                     ot: null,
-                    late: (now.getHours() >= 9 && now.getMinutes() > 0),
+                    late: isLate,
                     active: true,
                     timestamp: Date.now()
                 };
@@ -2038,8 +2172,13 @@
                     renderShiftLogs();
                 }
 
-                showToast("Clock-in verification recorded!", true);
+                if (isLate) {
+                    showToast("Clocked In (LATE - Punch after 9:30 AM)", false);
+                } else {
+                    showToast("Clock-in recorded on time!", true);
+                }
             } else {
+                // CLOCKING OUT LOGIC
                 isClockedIn = false;
                 updateClockUIState(false);
 
@@ -2049,10 +2188,31 @@
                 const remainingMins = diffMins % 60;
                 const durationText = `${hrs}h ${remainingMins}m`;
 
+                // RULE 3: Overtime calculation (Punch out AFTER 8:00 PM @ RM10/hour)
+                const otThresholdTime = new Date(now);
+                otThresholdTime.setHours(20, 0, 0, 0); // 8:00 PM target
+
+                let otText = null;
+                if (now > otThresholdTime) {
+                    const otMs = now - otThresholdTime;
+                    const otMins = Math.floor(otMs / 60000);
+                    
+                    if (otMins > 0) {
+                        const otHoursDecimal = otMins / 60;
+                        const otRate = 10; // RM10 per hour
+                        const otAmount = otHoursDecimal * otRate;
+                        
+                        const otHrsInt = Math.floor(otMins / 60);
+                        const otMinsRem = otMins % 60;
+                        otText = `${otHrsInt}h ${otMinsRem}m (+RM${otAmount.toFixed(2)})`;
+                    }
+                }
+
                 if (isFirebaseConnected && db && activeShiftKey) {
                     db.ref('shifts/' + safeUserKey + '/' + activeShiftKey).update({
                         out: timeStr,
                         duration: durationText,
+                        ot: otText,
                         active: false
                     });
                     activeShiftKey = null;
@@ -2060,12 +2220,17 @@
                     if (shiftLogsArray.length > 0) {
                         shiftLogsArray[0].out = timeStr;
                         shiftLogsArray[0].duration = durationText;
+                        shiftLogsArray[0].ot = otText;
                         shiftLogsArray[0].active = false;
                     }
                     renderShiftLogs();
                 }
 
-                showToast("Shift summary finalized and posted!", true);
+                if (otText) {
+                    showToast(`Clocked Out with OT after 8:00 PM! ${otText}`, true);
+                } else {
+                    showToast("Shift summary finalized and logged!", true);
+                }
             }
         }
 
@@ -2194,17 +2359,17 @@
 
             header.textContent = `Earnings Overview - ${choice}`;
             if (choice === "March 2026") {
-                otLabel.textContent = "Overtime Hours (12h x RM21.75)";
-                otVal.textContent = "RM 261.00";
-                netVal.textContent = "RM 2,510.40";
+                otLabel.textContent = "Overtime Hours (12h x RM10.00)";
+                otVal.textContent = "RM 120.00";
+                netVal.textContent = "RM 2,369.40";
             } else if (choice === "February 2026") {
                 otLabel.textContent = "Overtime Hours (0h)";
                 otVal.textContent = "RM 0.00";
                 netVal.textContent = "RM 2,195.15";
             } else {
-                otLabel.textContent = "Overtime Hours (8h x RM21.75)";
-                otVal.textContent = "RM 174.00";
-                netVal.textContent = "RM 2,402.51";
+                otLabel.textContent = "Overtime Hours (8h x RM10.00)";
+                otVal.textContent = "RM 80.00";
+                netVal.textContent = "RM 2,308.51";
             }
         }
 
@@ -2346,6 +2511,7 @@
         }
 
         window.onload = function() {
+            initPWAEngine();
             initFirebaseRTDB();
             startLiveClock();
             if (typeof renderShiftLogs === 'function') renderShiftLogs();

@@ -2482,11 +2482,117 @@
             if (isAdmin) {
                 attachAdminRealtimeListeners();
             } else {
+                // 1. Existing staff listeners
                 attachRealtimeListeners(activeUsername);
+                
+                // 2. Initialize staff notifications & real-time leave status updates
+                if (typeof initStaffRolePage === 'function') {
+                    initStaffRolePage(activeUsername);
+                }
             }
 
             showToast("Authenticated successfully!", true);
             setTimeout(() => navigateTo('dashboard-screen'), 600);
+        }
+
+        /**
+         * Call this function immediately after the staff logs in 
+         * or when the staff dashboard screen is displayed.
+         */
+        function initStaffRolePage(currentStaffKey) {
+            if (!currentStaffKey) {
+                console.error("No staff key provided for initialization!");
+                return;
+            }
+
+            // 1. Ask for browser push notification permissions
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            // 2. Start Real-Time Listener for Push Notifications
+            listenForStaffNotifications(currentStaffKey);
+
+            // 3. Start Real-Time Listener for Leave Status Updates
+            listenForStaffLeaveUpdates(currentStaffKey);
+        }
+
+        /**
+         * Real-Time Push Notification Listener
+         */
+        function listenForStaffNotifications(currentStaffKey) {
+            if (!isFirebaseConnected || !db) return;
+
+            const notifRef = db.ref(`notifications/${currentStaffKey}`);
+
+            // Listen only for NEW notifications added
+            notifRef.limitToLast(1).on('child_added', snapshot => {
+                const notif = snapshot.val();
+                if (!notif) return;
+
+                // Ignore notifications older than 15 seconds (prevents old popups on refresh)
+                if (Date.now() - notif.timestamp > 15000) return;
+
+                // A. Display In-App Toast
+                if (typeof showToast === 'function') {
+                    showToast(`${notif.title}: ${notif.message}`, notif.type === 'success');
+                }
+
+                // B. Trigger Browser Banner Notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(notif.title, {
+                        body: notif.message,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/1827/1827504.png'
+                    });
+                }
+            });
+        }
+
+        /**
+         * Real-Time Staff Leave List UI Updater
+         */
+        function listenForStaffLeaveUpdates(currentStaffKey) {
+            if (!isFirebaseConnected || !db) return;
+
+            // Listen to changes in the leaveRequests node for this staff
+            db.ref('leaveRequests').on('value', snapshot => {
+                const allLeaves = snapshot.val() || {};
+                const staffContainer = document.getElementById('staff-leave-list-container');
+                if (!staffContainer) return;
+
+                staffContainer.innerHTML = '';
+
+                // Filter leaves belonging to this staff member
+                const myLeaves = Object.keys(allLeaves)
+                    .map(id => ({ id, ...allLeaves[id] }))
+                    .filter(leave => leave.staffKey === currentStaffKey || leave.userKey === currentStaffKey);
+
+                if (myLeaves.length === 0) {
+                    staffContainer.innerHTML = `<p style="text-align:center; color:#888; font-size:12px;">No leave requests found.</p>`;
+                    return;
+                }
+
+                // Render staff cards automatically with live status badges
+                myLeaves.forEach(leave => {
+                    const status = leave.status || 'Pending';
+                    let badgeBg = '#FFF3C7', badgeColor = '#D97706';
+                    if (status === 'Approved') { badgeBg = '#DEF7EC'; badgeColor = '#03543F'; }
+                    else if (status === 'Rejected') { badgeBg = '#FDE8E8'; badgeColor = '#9B1C1C'; }
+
+                    const card = document.createElement('div');
+                    card.style.cssText = "background: white; padding: 12px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);";
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="font-size: 12px;">${leave.type || 'Leave Request'}</strong>
+                            <span style="font-size: 10px; font-weight: 800; background: ${badgeBg}; color: ${badgeColor}; padding: 2px 8px; border-radius: 10px;">
+                                ${status}
+                            </span>
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">Date: ${leave.dateRange || 'N/A'}</div>
+                    `;
+                    staffContainer.appendChild(card);
+                });
+            });
         }
 
         function renderDashboardForRole(role) {

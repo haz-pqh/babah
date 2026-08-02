@@ -11,16 +11,25 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Hemzal Staff">
     <link id="manifest-link" rel="manifest">
-    <link rel="icon" type="image" href="hemzal-logo.png">  
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FFEAEA'/><path d='M50 20C35 20 28 35 28 50C28 65 40 75 55 75C68 75 75 62 75 50' stroke='%23d1232a' stroke-width='7'/></svg>">
     
     <title>Hemzal Staff Portal</title>
-    <!-- FontAwesome 6 & jsPDF -->
+    <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Firebase JS SDK (App & Realtime Database) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- SheetJS for Excel Exports -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- jsPDF & AutoTable for PDF Exports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         * {
@@ -439,7 +448,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
             flex-shrink: 0;
         }
 
@@ -735,11 +744,6 @@
             visibility: visible;
         }
 
-        .promo-card.slide-left-out {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
-
         .promo-banner-img {
             position: absolute;
             top: 0;
@@ -852,6 +856,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 10px;
+            margin-top: 20px;
             flex-shrink: 0;
         }
 
@@ -990,6 +995,7 @@
         }
         .history-card.approved { border-left-color: #10B981; }
         .history-card.pending { border-left-color: #F59E0B; }
+        .history-card.rejected { border-left-color: #EF4444; }
 
         .history-details { display: flex; flex-direction: column; gap: 2px; }
         .history-type { font-size: 12px; font-weight: 800; color: #222; }
@@ -999,6 +1005,7 @@
         .history-badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; }
         .history-badge.approved { background: #D1FAE5; color: #10B981; }
         .history-badge.pending { background: #FEF3C7; color: #D97706; }
+        .history-badge.rejected { background: #FEE2E2; color: #EF4444; }
         .history-attachment-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; color: #047857; background-color: #D1FAE5; padding: 2px 6px; border-radius: 8px; margin-top: 4px; align-self: flex-start; }
 
         /* ==================== 5. USER PROFILE SCREEN ==================== */
@@ -1077,19 +1084,12 @@
         .payslip-total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: #1e1e1e; border-top: 2px dashed #E5E7EB; padding-top: 8px; margin-top: 4px; }
         .payslip-total-amount { color: #10B981; font-family: monospace; }
         
-        .btn-payslip-action { background-color: #E61C24; color: white; border: none; width: 100%; padding: 11px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-payslip-action { background-color: #E61C24; color: white; border: none; width: 100%; padding: 11px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.2s; text-align: center; margin-top: 6px; }
         .btn-payslip-action:active { transform: scale(0.97); }
         
         .payslip-history-section { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
         .payslip-history-title { font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
         .payslip-history-list { display: flex; flex-direction: column; gap: 6px; }
-        
-        .payslip-history-row { background: white; border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.01); cursor: pointer; }
-        .payslip-history-row:active { transform: scale(0.98); }
-        .payslip-history-info { display: flex; flex-direction: column; gap: 2px; }
-        .payslip-history-month { font-size: 12px; font-weight: 800; color: #222; }
-        .payslip-history-status { font-size: 8px; font-weight: 800; color: #10B981; background-color: #D1FAE5; padding: 1px 5px; border-radius: 8px; align-self: flex-start; }
-        .payslip-history-amount { font-size: 13px; font-weight: 800; color: #333; font-family: monospace; }
 
         /* ==================== 7. NAVIGATION BAR ==================== */
         .bottom-nav-container {
@@ -1209,6 +1209,54 @@
             animation: scanAnimation 2s infinite ease-in-out;
         }
 
+        .btn-logout-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background-color: #dc3545;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%; /* Keeps it circular like the avatar */
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.25);
+        }
+
+        .btn-logout-icon:hover {
+            background-color: #bb2d3b;
+        }
+
+        .btn-logout-icon:active {
+            transform: scale(0.92);
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        #staff-list-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        #staff-list-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Hide scrollbars for Chrome, Safari, and Opera */
+        .leave-filter-pills::-webkit-scrollbar,
+        #admin-leave-list-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbars for IE, Edge, and Firefox */
+        .leave-filter-pills,
+        #admin-leave-list-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
         @keyframes scanAnimation {
             0% { top: 0%; }
             50% { top: 100%; }
@@ -1280,7 +1328,16 @@
         <div id="login-screen" class="screen active">
             <div class="brand-container">
                 <div class="logo-placeholder">
-                    <img src="hemzal-logo.png" width="150">
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="#FFEAEA" />
+                        <path d="M50 20C35 20 28 35 28 50C28 65 40 75 55 75C68 75 75 62 75 50" stroke="#d1232a" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M38 42C38 40 42 38 44 42" stroke="#d1232a" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M56 42C56 40 60 38 62 42" stroke="#d1232a" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M42 55Q50 64 58 55" stroke="#E61C24" stroke-width="5" stroke-linecap="round"/>
+                        <circle cx="28" cy="22" r="6" fill="#FFD500"/>
+                        <circle cx="74" cy="26" r="4" fill="#FFD500"/>
+                        <circle cx="70" cy="68" r="8" fill="#FFD500"/>
+                    </svg>
                 </div>
                 <h1 class="brand-name">Hemzal Crispy</h1>
                 <p class="brand-subtitle">INTERNAL STAFF PORTAL</p>
@@ -1317,7 +1374,13 @@
         <div id="signup-screen" class="screen">
             <div class="brand-container">
                 <div class="logo-placeholder">
-                    <img src="hemzal-logo.png" width="150">
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="15" width="70" height="70" rx="20" fill="#FFF4F4" />
+                        <circle cx="50" cy="42" r="16" fill="#E61C24" />
+                        <path d="M26 78C26 65 34 58 50 58C66 58 74 65 74 78" fill="#E61C24" />
+                        <circle cx="72" cy="30" r="10" fill="#FFD500" />
+                        <path d="M67 30H77M72 25V35" stroke="#1e1e1e" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
                 </div>
                 <h1 class="brand-name">Join Hemzal</h1>
                 <p class="brand-subtitle">CREATE STAFF ACCOUNT</p>
@@ -1351,131 +1414,229 @@
         </div>
 
         <!-- ==================== DASHBOARD SCREEN ==================== -->
-        <div id="dashboard-screen" class="screen">
+        <div id="dashboard-screen" class="screen page-screen">
             <div class="top-banner">
                 <div class="banner-text">
                     <h2 id="welcome-username">Hello, Member!</h2>
-                    <p>Welcome to your workspace</p>
+                    <p id="welcome-user-role">Welcome to your workspace</p>
                 </div>
-                <div class="user-avatar">
+
+                <!-- Avatar (Shown for Staff) -->
+                <div id="staff-user-avatar" class="user-avatar">
                     <i class="fa-solid fa-user-ninja"></i>
                 </div>
+
+                <!-- Icon-Only Logout Button (Shown for Admin) -->
+                <button id="admin-logout-btn" class="btn-logout-icon" style="display: none;" onclick="performLogOut()" title="Logout" aria-label="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
             </div>
 
             <div class="dashboard-content-scroll">
-                <!-- Clock widget -->
-                <div id="clock-card" class="clock-widget alert-active">
-                    <div class="clock-header">
-                        <span class="clock-title">Shift Attendance Scheduler</span>
-                        <div id="status-badge" class="status-badge alert">
-                            <div class="status-dot"></div>
-                            <span id="status-text">Clocked Out</span>
-                        </div>
-                    </div>
-                    <div id="live-time" class="time-display">00:00:00 PM</div>
-                    <div id="live-date" class="date-display">Monday, Jan 01, 2026</div>
+
+                <!-- ==================== ADMIN DASHBOARD VIEW ==================== -->
+                <div id="admin-dashboard-container" style="display: none; flex-direction: column; gap: 15px; width: 100%;">
                     
-                    <div class="shift-rules-subtext">
-                        <i class="fa-solid fa-circle-info"></i> Shift: 8:00 AM – 8:00 PM | Late after 9:30 AM | OT @ RM10/hr after 8:00 PM
+                    <!-- Summary KPI Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%;">
+                        <!-- Total Staff Card -->
+                        <div style="background: white; border-radius: 20px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 10px; font-weight: 800; color: #888; text-transform: uppercase;">
+                                <i class="fa-solid fa-users" style="color: #d1232a;"></i> Staff Strength
+                            </span>
+                            <span id="admin-total-staff" style="font-size: 22px; font-weight: 900; color: #1e1e1e;">-- Members</span>
+                            <span id="admin-clocked-in-status" style="font-size: 9px; color: #10B981; font-weight: 800;">● -- Clocked-In Today</span>
+                        </div>
+
+                        <!-- Revenue Card -->
+                        <div style="background: white; border-radius: 20px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 10px; font-weight: 800; color: #888; text-transform: uppercase;">
+                                <i class="fa-solid fa-receipt" style="color: #10B981;"></i> Today's Revenue
+                            </span>
+                            <span id="admin-today-sales" style="font-size: 22px; font-weight: 900; color: #1e1e1e;">RM 0.00</span>
+                            <span id="admin-sales-trend" style="font-size: 9px; color: #10B981; font-weight: 800;">▲ Live Updated</span>
+                        </div>
                     </div>
 
-                    <button id="clock-btn" class="btn-clock" onclick="toggleShiftClock()">Clock In Entry</button>
+                    <!-- Daily Sales Performance Graph -->
+                    <div style="background: white; border-radius: 20px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; font-weight: 800; color: #d1232a; text-transform: uppercase; letter-spacing: 0.8px;">
+                                <i class="fa-solid fa-chart-simple"></i> Daily Sales Graph
+                            </span>
+                            <span style="font-size: 9px; font-weight: 800; background: #FFF7ED; color: #EA580C; padding: 2px 8px; border-radius: 10px;">Weekly Trend</span>
+                        </div>
+                        
+                        <div style="width: 100%; height: 160px; position: relative;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Admin Management Quick Actions -->
+                    <!-- <div class="cards-list">
+                        <div class="dashboard-card" onclick="navigateTo('leave-request-screen')">
+                            <div class="card-left-group">
+                                <div class="progress-circle"><i class="fa-solid fa-envelope-open-text"></i></div>
+                                <div class="card-info">
+                                    <h3 class="card-title">Leave Approvals</h3>
+                                    <p class="card-subtitle-desc">Review pending staff leave requests</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right card-chevron"></i>
+                        </div>
+
+                        <div class="dashboard-card" onclick="navigateTo('salary-editor-screen')">
+                            <div class="card-left-group">
+                                <div class="progress-circle"><i class="fa-solid fa-file-signature"></i></div>
+                                <div class="card-info">
+                                    <h3 class="card-title">Publish Salary Slips</h3>
+                                    <p class="card-subtitle-desc">Issue monthly payroll slips to staff</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right card-chevron"></i>
+                        </div>
+
+                        <div class="dashboard-card" onclick="navigateTo('staff-profile-screen')">
+                            <div class="card-left-group">
+                                <div class="progress-circle"><i class="fa-solid fa-user-gear"></i></div>
+                                <div class="card-info">
+                                    <h3 class="card-title">Manage Staff Profiles</h3>
+                                    <p class="card-subtitle-desc">View staff details & compensation</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right card-chevron"></i>
+                        </div>
+
+                        <div class="dashboard-card" onclick="navigateTo('sales-report-screen')">
+                            <div class="card-left-group">
+                                <div class="progress-circle"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                                <div class="card-info">
+                                    <h3 class="card-title">Sales Analytics & Export</h3>
+                                    <p class="card-subtitle-desc">Export daily & weekly revenue PDF/Excel</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right card-chevron"></i>
+                        </div>
+                    </div> -->
                 </div>
 
-                <!-- Balanced Leave Limits Grid -->
-                <div class="leave-balances-grid">
-                    <div class="balance-item">
-                        <div id="circle-annual" class="balance-circle" style="--percent: 90;">
-                            <span id="bal-annual">90%</span>
-                        </div>
-                        <span class="balance-label">Annual Leave</span>
-                    </div>
-                    <div class="balance-item">
-                        <div id="circle-sick" class="balance-circle" style="--percent: 70;">
-                            <span id="bal-sick">70%</span>
-                        </div>
-                        <span class="balance-label">Sick Leave</span>
-                    </div>
-                    <div class="balance-item">
-                        <div id="circle-casual" class="balance-circle" style="--percent: 45;">
-                            <span id="bal-casual">45%</span>
-                        </div>
-                        <span class="balance-label">Casual</span>
-                    </div>
-                    <div class="balance-item">
-                        <div id="circle-unpaid" class="balance-circle" style="--percent: 100;">
-                            <span id="bal-unpaid">100%</span>
-                        </div>
-                        <span class="balance-label">Unpaid</span>
-                    </div>
-                </div>
-
-                <!-- Actionable navigation list shortcuts -->
-                <div class="cards-list">
-                    <div class="dashboard-card" onclick="switchTab('leave-screen', this)">
-                        <div class="card-left-group">
-                            <div class="progress-circle">
-                                <i class="fa-solid fa-calendar-check"></i>
-                            </div>
-                            <div class="card-info">
-                                <h3 class="card-title">Apply Leave Portal</h3>
-                                <p class="card-subtitle-desc">Request time-off & view approvals</p>
+                <!-- ==================== STAFF DASHBOARD VIEW ==================== -->
+                <div id="staff-dashboard-container" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+                    <!-- Clock widget -->
+                    <div id="clock-card" class="clock-widget alert-active">
+                        <div class="clock-header">
+                            <span class="clock-title">Shift Attendance Scheduler</span>
+                            <div id="status-badge" class="status-badge alert">
+                                <div class="status-dot"></div>
+                                <span id="status-text">Clocked Out</span>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right card-chevron"></i>
-                    </div>
-                </div>
-
-                <!-- Attendance Log tracker container -->
-                <div class="shift-log-container">
-                    <div class="shift-log-header">
-                        <span class="shift-log-title"><i class="fa-solid fa-timeline"></i> Recent Punch Logs</span>
-                    </div>
-                    <div id="shift-log-list" class="shift-log-list"></div>
-                </div>
-
-                <!-- Promotion Slider widget -->
-                <div class="promo-ad-container">
-                    <div class="promo-ad-header">
-                        <span class="promo-ad-title">
-                            <i class="fa-solid fa-tags" style="color: #E61C24;"></i> Special Offers
-                        </span>
-                        <span class="promo-ad-badge">Hot Deals</span>
-                    </div>
-                    
-                    <div class="promo-slider-wrapper">
-                        <div class="promo-card active" id="promo-slide-0">
-                            <img class="promo-banner-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=500&q=80" alt="Promo Offer">
-                            <div class="promo-overlay-content">
-                                <div class="promo-tag">Limited Time Only</div>
-                                <h3 class="promo-heading">Crispy Combo Feast</h3>
-                                <p class="promo-subtext">Get 2x Signature Crunch Drums, Loaded Fries, and a drink for RM14.90!</p>
-                                <button class="promo-action-btn" onclick="showToast('Promo claimed! Show code AT-REDEEM to cashier.', true)">
-                                    Claim Deal <i class="fa-solid fa-arrow-right"></i>
-                                </button>
-                            </div>
+                        <div id="live-time" class="time-display">00:00:00 PM</div>
+                        <div id="live-date" class="date-display">Monday, Jan 01, 2026</div>
+                        
+                        <div class="shift-rules-subtext">
+                            <i class="fa-solid fa-circle-info"></i> Shift: 8:00 AM – 8:00 PM | Late after 9:30 AM | OT @ RM10/hr after 8:00 PM
                         </div>
 
-                        <div class="promo-card" id="promo-slide-1">
-                            <img class="promo-banner-img" src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=500&q=80" alt="Promo Offer">
-                            <div class="promo-overlay-content">
-                                <div class="promo-tag" style="background: #10B981; color: white;">Staff Discount</div>
-                                <h3 class="promo-heading">Double Whammy Box</h3>
-                                <p class="promo-subtext">Enjoy 40% off the complete double-patty crunch burger combo on your shift break.</p>
-                                <button class="promo-action-btn" onclick="showToast('Staff deal activated!', true)">
-                                    Unlock Voucher <i class="fa-solid fa-lock-open"></i>
-                                </button>
+                        <button id="clock-btn" class="btn-clock" onclick="toggleShiftClock()">Clock In Entry</button>
+                    </div>
+
+                    <!-- Leave Balances Grid -->
+                    <div class="leave-balances-grid">
+                        <div class="balance-item">
+                            <div id="circle-annual" class="balance-circle" style="--percent: 90;">
+                                <span id="bal-annual">90%</span>
                             </div>
+                            <span class="balance-label">Annual Leave</span>
+                        </div>
+                        <div class="balance-item">
+                            <div id="circle-sick" class="balance-circle" style="--percent: 70;">
+                                <span id="bal-sick">70%</span>
+                            </div>
+                            <span class="balance-label">Sick Leave</span>
+                        </div>
+                        <div class="balance-item">
+                            <div id="circle-casual" class="balance-circle" style="--percent: 45;">
+                                <span id="bal-casual">45%</span>
+                            </div>
+                            <span class="balance-label">Casual</span>
+                        </div>
+                        <div class="balance-item">
+                            <div id="circle-unpaid" class="balance-circle" style="--percent: 100;">
+                                <span id="bal-unpaid">100%</span>
+                            </div>
+                            <span class="balance-label">Unpaid</span>
                         </div>
                     </div>
 
-                    <div class="promo-dots">
-                        <div class="promo-dot active" onclick="setPromoSlide(0)"></div>
-                        <div class="promo-dot" onclick="setPromoSlide(1)"></div>
+                    <!-- Actionable navigation list shortcuts -->
+                    <div class="cards-list">
+                        <div class="dashboard-card" onclick="switchTab('leave-screen', this)">
+                            <div class="card-left-group">
+                                <div class="progress-circle">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <div class="card-info">
+                                    <h3 class="card-title">Apply Leave Portal</h3>
+                                    <p class="card-subtitle-desc">Request time-off & view approvals</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right card-chevron"></i>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Log tracker container -->
+                    <div class="shift-log-container">
+                        <div class="shift-log-header">
+                            <span class="shift-log-title"><i class="fa-solid fa-timeline"></i> Recent Punch Logs</span>
+                        </div>
+                        <div id="shift-log-list" class="shift-log-list"></div>
+                    </div>
+
+                    <!-- Promotion Slider widget -->
+                    <div class="promo-ad-container">
+                        <div class="promo-ad-header">
+                            <span class="promo-ad-title">
+                                <i class="fa-solid fa-tags" style="color: #E61C24;"></i> Special Offers
+                            </span>
+                            <span class="promo-ad-badge">Hot Deals</span>
+                        </div>
+                        
+                        <div class="promo-slider-wrapper">
+                            <div class="promo-card active" id="promo-slide-0">
+                                <img class="promo-banner-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=500&q=80" alt="Promo Offer">
+                                <div class="promo-overlay-content">
+                                    <div class="promo-tag">Limited Time Only</div>
+                                    <h3 class="promo-heading">Crispy Combo Feast</h3>
+                                    <p class="promo-subtext">Get 2x Signature Crunch Drums, Loaded Fries, and a drink for RM14.90!</p>
+                                    <button class="promo-action-btn" onclick="showToast('Promo claimed! Show code AT-REDEEM to cashier.', true)">
+                                        Claim Deal <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="promo-card" id="promo-slide-1">
+                                <img class="promo-banner-img" src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=500&q=80" alt="Promo Offer">
+                                <div class="promo-overlay-content">
+                                    <div class="promo-tag" style="background: #10B981; color: white;">Staff Discount</div>
+                                    <h3 class="promo-heading">Double Whammy Box</h3>
+                                    <p class="promo-subtext">Enjoy 40% off the complete double-patty crunch burger combo on your shift break.</p>
+                                    <button class="promo-action-btn" onclick="showToast('Staff deal activated!', true)">
+                                        Unlock Voucher <i class="fa-solid fa-lock-open"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="promo-dots">
+                            <div class="promo-dot active" onclick="setPromoSlide(0)"></div>
+                            <div class="promo-dot" onclick="setPromoSlide(1)"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Bottom Navigation Bar -->
             <div class="bottom-nav-container">
                 <div class="nav-btn active-tab" onclick="switchTab('dashboard-screen', this)"><i class="fa-solid fa-house-chimney"></i></div>
                 <div class="nav-btn" onclick="switchTab('leave-screen', this)"><i class="fa-solid fa-calendar-plus"></i></div>
@@ -1485,8 +1646,12 @@
             </div>
         </div>
 
-        <!-- ==================== LEAVE SCREEN ==================== -->
-        <div id="leave-screen" class="screen">
+        <!-- ================================================================= -->
+        <!--                            STAFF PAGES                            -->
+        <!-- ================================================================= -->
+
+        <!-- 1. STAFF LEAVE SCREEN -->
+        <div id="leave-screen" class="screen page-screen" style="display: none;">
             <div class="leave-header-bar">
                 <h2>Leave Center</h2>
                 <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
@@ -1504,12 +1669,12 @@
                                 <option value="Unpaid Leave">Unpaid Leave</option>
                             </select>
                         </div>
-                        <div class="date-row" style="margin-bottom: 8px;">
-                            <div class="form-control">
+                        <div class="date-row" style="margin-bottom: 8px; display: flex; gap: 8px;">
+                            <div class="form-control" style="flex: 1;">
                                 <label>Start Date</label>
                                 <input type="date" id="start-date" required>
                             </div>
-                            <div class="form-control">
+                            <div class="form-control" style="flex: 1;">
                                 <label>End Date</label>
                                 <input type="date" id="end-date" required>
                             </div>
@@ -1525,7 +1690,7 @@
                                     <span class="dropzone-subtext">PDF, PNG, JPG files up to 5MB</span>
                                 </div>
                             </div>
-                            <div id="file-preview-capsule" class="file-attached-preview">
+                            <div id="file-preview-capsule" class="file-attached-preview" style="display: none;">
                                 <div class="file-preview-info">
                                     <i class="fa-solid fa-file-medical"></i>
                                     <span id="attached-file-name" class="file-name-text">mc_slip_scan.pdf</span>
@@ -1545,19 +1710,12 @@
                 <div class="leave-history-section">
                     <span class="history-title">Application Status Logs</span>
                     <div id="leave-history-list" class="leave-history-list">
-                        <div class="history-card approved">
-                            <div class="history-details">
-                                <span class="history-type">Medical / Sick Leave</span>
-                                <span class="history-date">Feb 10, 2026 - Feb 11, 2026 (2 days)</span>
-                                <span class="history-reason">Reason: Wisdom tooth surgery extraction</span>
-                                <span class="history-attachment-tag"><i class="fa-solid fa-paperclip"></i> mc_dental_slip.jpg</span>
-                            </div>
-                            <span class="history-badge approved">Approved</span>
-                        </div>
+                        <!-- Dynamically populated from Firebase -->
                     </div>
                 </div>
             </div>
 
+            <!-- Staff Bottom Navigation -->
             <div class="bottom-nav-container">
                 <div class="nav-btn" onclick="switchTab('dashboard-screen', this)"><i class="fa-solid fa-house-chimney"></i></div>
                 <div class="nav-btn active-tab" onclick="switchTab('leave-screen', this)"><i class="fa-solid fa-calendar-plus"></i></div>
@@ -1567,8 +1725,8 @@
             </div>
         </div>
 
-        <!-- ==================== USER PROFILE SCREEN ==================== -->
-        <div id="profile-screen" class="screen">
+        <!-- 2. STAFF PROFILE SCREEN -->
+        <div id="profile-screen" class="screen page-screen" style="display: none;">
             <div class="leave-header-bar">
                 <h2>My Profile</h2>
                 <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
@@ -1578,14 +1736,14 @@
                 <div class="profile-card">
                     <div class="profile-avatar-large"><i class="fa-solid fa-user-ninja"></i></div>
                     <div>
-                        <h3 id="profile-full-name" class="profile-name-title">Alex Mercer</h3>
-                        <span class="profile-role-badge">Kitchen Floor Supervisor</span>
+                        <h3 id="profile-full-name" class="profile-name-title">Staff Member</h3>
+                        <span id="profile-role-badge" class="profile-role-badge">Kitchen Staff</span>
                     </div>
                     <div class="profile-details-grid">
-                        <div class="profile-detail-row"><span>Staff ID</span><span id="profile-staff-id">EM-2026-089</span></div>
+                        <div class="profile-detail-row"><span>Staff ID</span><span id="profile-staff-id">--</span></div>
                         <div class="profile-detail-row"><span>Assigned Outlet</span><span id="profile-outlet">Ampang Jaya Branch</span></div>
                         <div class="profile-detail-row"><span>Join Date</span><span id="profile-join-date">March 14, 2024</span></div>
-                        <div class="profile-detail-row"><span>Hourly Tier Rate</span><span id="profile-rate">RM 14.50 / Hr</span></div>
+                        <div class="profile-detail-row"><span>Hourly Rate</span><span id="profile-rate">RM 14.50 / Hr</span></div>
                     </div>
                 </div>
 
@@ -1594,13 +1752,14 @@
                         <span>Accrued Earnings Estimates</span>
                         <i class="fa-solid fa-wallet"></i>
                     </div>
-                    <div id="profile-accrued-amount" class="payroll-amount">RM 2,482.50</div>
-                    <p class="payroll-sub-text">Calculations based on 154 hours logged + OT premium (RM10/hr after 8PM) for the ongoing calendar payout timeline windows.</p>
+                    <div id="profile-accrued-amount" class="payroll-amount">RM 0.00</div>
+                    <p class="payroll-sub-text">Calculations based on active shift logs for the ongoing payout period.</p>
                 </div>
 
                 <button class="btn-logout" onclick="performLogOut()"><i class="fa-solid fa-power-off"></i> Disconnect Session</button>
             </div>
 
+            <!-- Staff Bottom Navigation -->
             <div class="bottom-nav-container">
                 <div class="nav-btn" onclick="switchTab('dashboard-screen', this)"><i class="fa-solid fa-house-chimney"></i></div>
                 <div class="nav-btn" onclick="switchTab('leave-screen', this)"><i class="fa-solid fa-calendar-plus"></i></div>
@@ -1610,8 +1769,8 @@
             </div>
         </div>
 
-        <!-- ==================== PAYSLIP SCREEN ==================== -->
-        <div id="payslip-screen" class="screen">
+        <!-- 3. STAFF PAYSLIP SCREEN -->
+        <div id="payslip-screen" class="screen page-screen" style="display: none;">
             <div class="leave-header-bar">
                 <h2>Salary Slips</h2>
                 <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
@@ -1621,28 +1780,23 @@
                 <div class="cycle-select-container">
                     <label>Select Payroll Settlement Window</label>
                     <select id="payslip-selector" onchange="updatePayslipContentView()">
-                        <option value="April 2026">April 01, 2026 - April 30, 2026 (Active)</option>
-                        <option value="March 2026">March 01, 2026 - March 31, 2026</option>
-                        <option value="February 2026">February 01, 2026 - February 28, 2026</option>
+                        <!-- Populated dynamically -->
                     </select>
                 </div>
 
                 <div class="payslip-details-card">
-                    <h3 class="form-title" id="payslip-main-header" style="border-bottom-color: #E61C24;">Earnings Overview - April 2026</h3>
+                    <h3 class="form-title" id="payslip-main-header" style="border-bottom-color: #E61C24;">Earnings Overview</h3>
                     
                     <span class="payslip-sec-title">Incomes / Base Additions</span>
-                    <div class="payslip-row"><span>Regular Hours (160h x RM14.50)</span><span>RM 2,320.00</span></div>
-                    <div class="payslip-row"><span id="payslip-ot-label">Overtime Hours (8h x RM10.00)</span><span id="payslip-ot-val">RM 80.00</span></div>
-                    <div class="payslip-row"><span>Performance Allowance Incentive</span><span>RM 200.00</span></div>
+                    <div class="payslip-row"><span>Basic Salary</span><span id="payslip-basic-val">RM 0.00</span></div>
+                    <div class="payslip-row"><span>Allowances & OT</span><span id="payslip-allowance-val">RM 0.00</span></div>
 
                     <span class="payslip-sec-title" style="margin-top: 5px;">Statutory Deductions</span>
-                    <div class="payslip-row deduction"><span>EPF Staff Contribution (11%)</span><span>-RM 274.34</span></div>
-                    <div class="payslip-row deduction"><span>SOCSO Insurance Deduction</span><span>-RM 12.45</span></div>
-                    <div class="payslip-row deduction"><span>EIS Employment Loss Protection</span><span>-RM 4.70</span></div>
+                    <div class="payslip-row deduction"><span>EPF / SOCSO Deductions</span><span id="payslip-deduction-val">-RM 0.00</span></div>
 
                     <div class="payslip-total-row">
                         <span>Net Take-home Payout</span>
-                        <span class="payslip-total-amount" id="payslip-net-amount">RM 2,308.51</span>
+                        <span class="payslip-total-amount" id="payslip-net-amount">RM 0.00</span>
                     </div>
 
                     <button class="btn-payslip-action" onclick="generatePayslipPDF()"><i class="fa-solid fa-file-pdf"></i> Download Document Slip</button>
@@ -1650,25 +1804,13 @@
 
                 <div class="payslip-history-section">
                     <span class="payslip-history-title">Disbursement Ledger Archive</span>
-                    <div class="payslip-history-list">
-                        <div class="payslip-history-row" onclick="selectArchivedPayslipIndex('March 2026')">
-                            <div class="payslip-history-info">
-                                <span class="payslip-history-month">March 2026 Settlement</span>
-                                <span class="payslip-history-status">Transferred</span>
-                            </div>
-                            <span class="payslip-history-amount">RM 2,510.40</span>
-                        </div>
-                        <div class="payslip-history-row" onclick="selectArchivedPayslipIndex('February 2026')">
-                            <div class="payslip-history-info">
-                                <span class="payslip-history-month">February 2026 Settlement</span>
-                                <span class="payslip-history-status">Transferred</span>
-                            </div>
-                            <span class="payslip-history-amount">RM 2,195.15</span>
-                        </div>
+                    <div id="payslip-history-list" class="payslip-history-list">
+                        <!-- Dynamically loaded previous payslips -->
                     </div>
                 </div>
             </div>
 
+            <!-- Staff Bottom Navigation -->
             <div class="bottom-nav-container">
                 <div class="nav-btn" onclick="switchTab('dashboard-screen', this)"><i class="fa-solid fa-house-chimney"></i></div>
                 <div class="nav-btn" onclick="switchTab('leave-screen', this)"><i class="fa-solid fa-calendar-plus"></i></div>
@@ -1678,12 +1820,277 @@
             </div>
         </div>
 
+
+        <!-- ================================================================= -->
+        <!--                            ADMIN PAGES                            -->
+        <!-- ================================================================= -->
+
+        <!-- ADMIN STAFF LEAVE REQUEST APPROVAL SCREEN -->
+        <div id="leave-request-screen" class="screen page-screen" style="display: none; padding: 16px;">
+            <div class="leave-header-bar">
+                <h2>Staff Leave Approvals</h2>
+                <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+
+            <!-- Filter Pills / Tabs (Horizontal Scroll - Scrollbar Hidden) -->
+            <div class="leave-filter-pills" style="display: flex; gap: 8px; margin: 12px 0; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none;">
+                <button onclick="filterLeaveRequests('all')" class="leave-filter-btn active" id="filter-all" style="background: #d1232a; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap;">All</button>
+                <button onclick="filterLeaveRequests('Pending')" class="leave-filter-btn" id="filter-pending" style="background: #e5e7eb; color: #374151; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap;">Pending</button>
+                <button onclick="filterLeaveRequests('Approved')" class="leave-filter-btn" id="filter-approved" style="background: #e5e7eb; color: #374151; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap;">Approved</button>
+                <button onclick="filterLeaveRequests('Rejected')" class="leave-filter-btn" id="filter-rejected" style="background: #e5e7eb; color: #374151; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap;">Rejected</button>
+            </div>
+
+            <!-- Scrollable Leave Request Feed Container (Vertical Scroll - Scrollbar Hidden) -->
+            <div id="admin-leave-list-container" style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-height: calc(100vh - 210px); overflow-y: auto; padding-bottom: 20px; scrollbar-width: none; -ms-overflow-style: none;">
+                <!-- Populated dynamically via Firebase -->
+            </div>
+        </div>
+
+        <!-- 2. ADMIN SALARY SLIP EDITOR SCREEN -->
+        <div id="salary-editor-screen" class="screen page-screen" style="display: none; padding: 16px;">
+            <div class="leave-header-bar">
+                <h2>Salary Slip Editor</h2>
+                <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+            <form id="salary-editor-form" onsubmit="saveStaffSalarySlip(event)" style="display: flex; flex-direction: column; gap: 12px; background: white; padding: 16px; border-radius: 16px; margin-top: 15px; width: 100%;">
+                <label style="font-size: 12px; font-weight: 700;">Select Staff</label>
+                <select id="salary-staff-select" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></select>
+
+                <label style="font-size: 12px; font-weight: 700;">Pay Period</label>
+                <input type="month" id="salary-month" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700;">Basic Salary (RM)</label>
+                        <input type="number" step="0.01" id="salary-basic" placeholder="3000.00" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700;">Allowances (RM)</label>
+                        <input type="number" step="0.01" id="salary-allowance" placeholder="200.00" value="0" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700;">Deductions (EPF/SOCSO)</label>
+                        <input type="number" step="0.01" id="salary-deduction" placeholder="330.00" value="0" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700;">Overtime / Bonus (RM)</label>
+                        <input type="number" step="0.01" id="salary-bonus" placeholder="150.00" value="0" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-leave" style="background: #10B981; margin-top: 8px;">
+                    <i class="fa-solid fa-paper-plane"></i> Publish Salary Slip to Staff
+                </button>
+            </form>
+        </div>
+
+        <!-- 3. ADMIN STAFF PROFILE MANAGEMENT SCREEN -->
+        <div id="staff-profile-screen" class="screen page-screen" style="display: none; padding: 16px;">
+            <div class="leave-header-bar">
+                <h2>Staff Directory</h2>
+                <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+
+            <!-- Top Action Bar: Search & Add Button -->
+            <div style="display: flex; gap: 8px; margin-top: 10px; align-items: center;">
+                <div class="input-group" style="background: white; border: 1px solid #ddd; margin-bottom: 0; flex: 1;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="staff-search-input" placeholder="Search staff by name or role..." onkeyup="filterStaffList()">
+                </div>
+                <button onclick="openAddStaffModal()" style="background: #10B981; color: white; border: none; padding: 12px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-user-plus"></i> Add Staff
+                </button>
+            </div>
+
+            <!-- Staff List Container -->
+            <div id="staff-list-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px; width: 100%; max-height: calc(100vh - 180px); overflow-y: auto; padding-bottom: 20px; scrollbar-width: none; -ms-overflow-style: none;">
+                <!-- Dynamically populated from Firebase -->
+            </div>
+        </div>
+
+        <!-- ==================== ADD STAFF MODAL ==================== -->
+        <div id="add-staff-modal" class="bio-modal-overlay" style="display: none; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1001; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;">
+            <div style="background: white; width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; color: #333; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFEAA1; padding-bottom: 10px; margin-bottom: 12px;">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #d1232a;"><i class="fa-solid fa-user-plus"></i> Add New Staff</h3>
+                    <button onclick="closeAddStaffModal()" style="background: none; border: none; font-size: 18px; color: #888; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <form id="add-staff-form" onsubmit="saveNewStaffProfile(event)" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="form-control">
+                        <label>Full Name</label>
+                        <input type="text" id="add-staff-name" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Username</label>
+                        <input type="text" id="add-staff-username" placeholder="johndoe" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Email Address</label>
+                        <input type="email" id="add-staff-email" placeholder="john@example.com" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Role / Position</label>
+                        <select id="add-staff-role" required>
+                            <option value="">Select Role</option>
+                            <option value="Kitchen Staff">Kitchen Staff</option>
+                            <option value="Cashier">Cashier</option>
+                            <option value="Floor Crew">Floor Crew</option>
+                            <option value="Assistant Manager">Assistant Manager</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Hourly Rate (RM / Hr)</label>
+                        <input type="text" id="add-staff-rate" placeholder="RM 14.50 / Hr" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Assigned Outlet</label>
+                        <input type="text" id="add-staff-outlet" placeholder="Ampang Jaya Branch" required>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button type="button" onclick="closeAddStaffModal()" style="flex: 1; background: #e5e5e7; color: #374151; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;">Cancel</button>
+                        <button type="submit" style="flex: 1; background: #10B981; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-plus"></i> Save Staff</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== EDIT STAFF MODAL ==================== -->
+        <div id="edit-staff-modal" class="bio-modal-overlay" style="display: none; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1001; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;">
+            <div style="background: white; width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; color: #333; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFEAA1; padding-bottom: 10px; margin-bottom: 12px;">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #d1232a;"><i class="fa-solid fa-user-pen"></i> Edit Staff Profile</h3>
+                    <button onclick="closeEditStaffModal()" style="background: none; border: none; font-size: 18px; color: #888; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <form id="edit-staff-form" onsubmit="saveStaffProfileChanges(event)" style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="hidden" id="edit-staff-key" />
+
+                    <div class="form-control">
+                        <label>Full Name</label>
+                        <input type="text" id="edit-staff-name" name="name" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Username</label>
+                        <input type="text" id="edit-staff-username" disabled style="background: #eee; cursor: not-allowed;">
+                    </div>
+
+                    <div class="form-control">
+                        <label>Email Address</label>
+                        <input type="email" id="edit-staff-email" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Role / Position</label>
+                        <select id="edit-staff-role" required>
+                            <option value="Kitchen Staff">Kitchen Staff</option>
+                            <option value="Cashier">Cashier</option>
+                            <option value="Floor Crew">Floor Crew</option>
+                            <option value="Assistant Manager">Assistant Manager</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Hourly Rate (RM / Hr)</label>
+                        <input type="text" id="edit-staff-rate" placeholder="RM 14.50 / Hr" required>
+                    </div>
+
+                    <div class="form-control">
+                        <label>Assigned Outlet</label>
+                        <input type="text" id="edit-staff-outlet" placeholder="Ampang Jaya Branch" required>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button type="button" onclick="closeEditStaffModal()" style="flex: 1; background: #e5e7eb; color: #374151; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;">Cancel</button>
+                        <button type="submit" style="flex: 1; background: #10B981; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 4. ADMIN SALES REPORT SCREEN -->
+        <div id="sales-report-screen" class="screen page-screen" style="display: none; padding: 16px;">
+            <div class="leave-header-bar">
+                <h2>Sales Reports</h2>
+                <button class="back-dash-btn" onclick="navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-top: 15px; display: flex; flex-direction: column; gap: 14px; width: 100%;">
+                <div>
+                    <label style="font-size: 12px; font-weight: 700;">Report Type / Filter</label>
+                    <select id="report-filter-type" onchange="filterSalesReports()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 4px;">
+                        <option value="daily">Daily Report (Past 7 Days)</option>
+                        <option value="weekly">Weekly Summary</option>
+                        <option value="yearly">Yearly Breakdown</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="exportSalesReport('pdf')" style="flex: 1; background: #EF4444; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer;">
+                        <i class="fa-solid fa-file-pdf"></i> Export PDF
+                    </button>
+                    <button onclick="exportSalesReport('excel')" style="flex: 1; background: #10B981; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer;">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #eee;">
+
+                <div style="max-height: 250px; overflow-y: auto;">
+                    <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #ddd; color: #666;">
+                                <th style="padding: 8px;">Date</th>
+                                <th style="padding: 8px;">Orders</th>
+                                <th style="padding: 8px;">Total (RM)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-report-body">
+                            <!-- Dynamic sales rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        /* ==================== PWA SETUP & SERVICE WORKER INJECTION ==================== */
+        /* ==================== GLOBAL APP STATE ==================== */
+        const mockUsers = [
+            { username: "admin", password: "password", name: "Alex Mercer", role: "Manager", rate: "RM 25.00 / Hr" },
+            { username: "staff1", password: "password", name: "Siti Nurhaliza", role: "Kitchen Staff", rate: "RM 14.50 / Hr" }
+        ];
+
+        let activeUsername = "admin";
+        let activeStaffName = "Alex Mercer";
+        let isClockedIn = false;
+        let punchInTime = null;
+        let clockTimerId = null;
+        let currentPromoIndex = 0;
+        let promoAutoplayTimer;
+        let activeShiftKey = null;
+        let salesChartInstance = null;
+        let attachedFileName = null;
+
+        let shiftLogsArray = [];
+
+        /* ==================== PWA SETUP & SERVICE WORKER ==================== */
         function initPWAEngine() {
-            // Dynamic Manifest Data URI setup
             const manifestObj = {
                 name: "Hemzal Staff Portal",
                 short_name: "Hemzal Staff",
@@ -1692,23 +2099,17 @@
                 background_color: "#FFD500",
                 theme_color: "#d1232a",
                 description: "Hemzal Crispy Chicken Staff Portal",
-                "icons": [
+                icons: [
                     {
-                    "src": "img/hemzal-logo.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                    },
-                    {
-                    "src": "img/hemzal-logo.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
+                        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FFEAEA'/><path d='M50 20C35 20 28 35 28 50C28 65 40 75 55 75C68 75 75 62 75 50' stroke='%23d1232a' stroke-width='7'/></svg>",
+                        sizes: "192x192 512x512",
+                        type: "image/svg+xml"
                     }
                 ]
             };
             const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
             document.getElementById('manifest-link').setAttribute('href', URL.createObjectURL(manifestBlob));
 
-            // Dynamic Service Worker Blob Registration
             if ('serviceWorker' in navigator) {
                 const swCode = `
                     self.addEventListener('install', (e) => self.skipWaiting());
@@ -1782,71 +2183,175 @@
             }
         }
 
-        const mockUsers = [
-            { username: "admin", password: "password", name: "Alex Mercer" }
-        ];
-
-        let activeUsername = "admin";
-        let activeStaffName = "Alex Mercer";
-        let isClockedIn = false;
-        let punchInTime = null;
-        let clockTimerId = null;
-        let currentPromoIndex = 0;
-        let promoAutoplayTimer;
-        let activeShiftKey = null;
-
-        let sickLeaveLeft = 70;
-        let casualLeaveLeft = 45;
-        let unpaidLeaveLeft = 100;
-
-        let shiftLogsArray = [];
-
-        // Global Cross-fading Router System
+        /* ==================== ROUTING & NAVIGATION ==================== */
         function navigateTo(screenId) {
-            const activeScreen = document.querySelector('.screen.active');
+            const allScreens = document.querySelectorAll('.screen, .page-screen');
+            allScreens.forEach(screen => {
+                screen.style.display = 'none';
+                screen.classList.remove('active');
+            });
+
             const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.style.display = 'flex';
+                setTimeout(() => targetScreen.classList.add('active'), 10);
+            }
 
-            if (activeScreen) {
-                activeScreen.style.opacity = '0';
-                activeScreen.style.transform = 'translateY(-20px)';
-                
-                setTimeout(() => {
-                    activeScreen.classList.remove('active');
-                    activeScreen.style.display = 'none';
-
-                    targetScreen.style.display = 'flex';
-                    targetScreen.offsetHeight; // force layout recalculation
-                    
-                    targetScreen.classList.add('active');
-                    targetScreen.style.opacity = '1';
-                    targetScreen.style.transform = 'translateY(0)';
-                }, 350);
+            if (screenId === 'leave-screen') {
+                loadStaffLeaveLogs();
+            } else if (screenId === 'payslip-screen') {
+                loadStaffPayslips();
+            } else if (screenId === 'profile-screen') {
+                loadStaffProfileInfo();
+            } else if (screenId === 'leave-request-screen') {
+                loadAllStaffLeaveRequests();
+            } else if (screenId === 'salary-editor-screen') {
+                populateSalaryStaffDropdown();
+            } else if (screenId === 'staff-profile-screen') {
+                loadStaffProfiles();
+            } else if (screenId === 'sales-report-screen') {
+                filterSalesReports();
             }
         }
 
-        // Add active class to matching nav buttons dynamically across screens
-        function switchTab(screenId, element) {
-            if (element.classList.contains('active-tab')) return;
-            
-            document.querySelectorAll('.bottom-nav-container').forEach(nav => {
-                nav.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-tab'));
-            });
-            
-            document.querySelectorAll('.bottom-nav-container').forEach(nav => {
-                const btns = nav.querySelectorAll('.nav-btn');
-                if (screenId === 'dashboard-screen') btns[0].classList.add('active-tab');
-                else if (screenId === 'leave-screen') btns[1].classList.add('active-tab');
-                else if (screenId === 'payslip-screen') btns[3].classList.add('active-tab');
-                else if (screenId === 'profile-screen') btns[4].classList.add('active-tab');
-            });
-
+        function switchTab(screenId, btnElement) {
             navigateTo(screenId);
+            if (btnElement) {
+                const navContainer = btnElement.closest('.bottom-nav-container');
+                if (navContainer) {
+                    navContainer.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-tab'));
+                    btnElement.classList.add('active-tab');
+                }
+            }
         }
 
         function navigateToDashboard() {
-            switchTab('dashboard-screen', document.querySelector('.bottom-nav-container .nav-btn'));
+            navigateTo('dashboard-screen');
         }
 
+        /* ==================== BOTTOM NAVIGATION ENGINE ==================== */
+
+        // Your custom navigation function
+        const getBottomNavItems = (userRole) => {
+        if (userRole === 'admin') {
+            return [
+            {
+                id: 'manage_staff',
+                label: 'Manage Staff Profiles',
+                icon: 'ManageStaffIcon',
+                route: 'StaffProfilePage',
+            },
+            {
+                id: 'leave_approvals',
+                label: 'Leave Approvals',
+                icon: 'LeaveApprovalsIcon',
+                route: 'StaffLeaveRequestsPage',
+            },
+            {
+                id: 'publish_salary',
+                label: 'Publish Salary Slips',
+                icon: 'PublishSalaryIcon',
+                route: 'SalarySlipEditorPage',
+            },
+            {
+                id: 'sales_analytics',
+                label: 'Sales Analytics & Export',
+                icon: 'SalesAnalyticsIcon',
+                route: 'SalesReportsPage',
+            },
+            ];
+        }
+
+        // Default Staff Nav Items
+        return [
+            {
+            id: 'home',
+            label: 'Home',
+            icon: 'HomeIcon',
+            route: 'HomePage',
+            },
+            {
+            id: 'leave_center',
+            label: 'Leave Center',
+            icon: 'LeaveCenterIcon',
+            route: 'LeaveCenterPage',
+            },
+            {
+            id: 'salary_slips',
+            label: 'Salary Slips',
+            icon: 'SalarySlipsIcon',
+            route: 'SalarySlipsPage',
+            },
+            {
+            id: 'my_profile',
+            label: 'My Profile',
+            icon: 'MyProfileIcon',
+            route: 'MyProfilePage',
+            },
+        ];
+        };
+
+        // Route to Screen ID mapping
+        const routeToScreenMap = {
+            'HomePage': 'dashboard-screen',
+            'LeaveCenterPage': 'leave-screen',
+            'SalarySlipsPage': 'payslip-screen',
+            'MyProfilePage': 'profile-screen',
+            'StaffProfilePage': 'staff-profile-screen',
+            'StaffLeaveRequestsPage': 'leave-request-screen',
+            'SalarySlipEditorPage': 'salary-editor-screen',
+            'SalesReportsPage': 'sales-report-screen'
+        };
+
+        // Icon to FontAwesome class mapping
+        const iconToFaMap = {
+            'HomeIcon': 'fa-house-chimney',
+            'LeaveCenterIcon': 'fa-calendar-plus',
+            'SalarySlipsIcon': 'fa-file-invoice-dollar',
+            'MyProfileIcon': 'fa-user-gear',
+            'ManageStaffIcon': 'fa-users-gear',
+            'LeaveApprovalsIcon': 'fa-envelope-open-text',
+            'PublishSalaryIcon': 'fa-file-signature',
+            'SalesAnalyticsIcon': 'fa-chart-pie'
+        };
+
+        /**
+         * Dynamically builds and inserts the bottom navigation items into all container bars
+         * @param {string} userRole - 'admin' or 'staff'
+         */
+        function renderBottomNav(userRole) {
+            const navItems = getBottomNavItems(userRole);
+            const navContainers = document.querySelectorAll('.bottom-nav-container');
+
+            navContainers.forEach(container => {
+                container.innerHTML = ''; // Clear static nav items
+
+                navItems.forEach((item, index) => {
+                    const screenId = routeToScreenMap[item.route] || 'dashboard-screen';
+                    const iconClass = iconToFaMap[item.icon] || 'fa-circle';
+
+                    // Create Nav Button
+                    const btn = document.createElement('div');
+                    btn.className = `nav-btn ${index === 0 ? 'active-tab' : ''}`;
+                    btn.setAttribute('title', item.label);
+                    btn.onclick = function() { switchTab(screenId, this); };
+                    btn.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+
+                    container.appendChild(btn);
+
+                    // Insert Center Biometric Quick-Action Button after 2nd item
+                    if (index === 1) {
+                        const centerBtn = document.createElement('div');
+                        centerBtn.className = 'nav-btn center-btn';
+                        centerBtn.onclick = triggerBiometricVerify;
+                        centerBtn.innerHTML = `<i class="fa-solid fa-fingerprint"></i>`;
+                        container.appendChild(centerBtn);
+                    }
+                });
+            });
+        }
+
+        /* ==================== NOTIFICATIONS & BIOMETRICS ==================== */
         function showToast(message, isSuccess = true) {
             const toast = document.getElementById('toast');
             const toastIcon = document.getElementById('toast-icon');
@@ -1865,71 +2370,20 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
 
-        /* ==================== REALTIME DATABASE SYNC LISTENERS ==================== */
-        function attachRealtimeListeners(username) {
-            if (!isFirebaseConnected || !db) return;
-
-            const safeUserKey = username.replace(/[.#$/[\]]/g, '_');
-
-            // 1. Shift Logs Realtime Listener
-            db.ref('shifts/' + safeUserKey).on('value', snapshot => {
-                const data = snapshot.val();
-                if (data) {
-                    const loadedLogs = [];
-                    Object.keys(data).forEach(key => {
-                        loadedLogs.push({ id: key, ...data[key] });
-                    });
-                    loadedLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                    shiftLogsArray = loadedLogs;
-                    renderShiftLogs();
-
-                    // Check active shift state
-                    const activeShift = loadedLogs.find(l => l.active);
-                    if (activeShift) {
-                        isClockedIn = true;
-                        activeShiftKey = activeShift.id;
-                        punchInTime = new Date(activeShift.timestamp);
-                        updateClockUIState(true);
-                    } else {
-                        isClockedIn = false;
-                        activeShiftKey = null;
-                        updateClockUIState(false);
-                    }
-                } else {
-                    shiftLogsArray = [];
-                    isClockedIn = false;
-                    activeShiftKey = null;
-                    updateClockUIState(false);
-                    renderShiftLogs();
-                }
-            });
-
-            // 2. Leave History Realtime Listener
-            db.ref('leaves/' + safeUserKey).on('value', snapshot => {
-                const data = snapshot.val();
-                if (data) {
-                    const listContainer = document.getElementById('leave-history-list');
-                    listContainer.innerHTML = '';
-                    Object.keys(data).forEach(key => {
-                        const leave = data[key];
-                        const newCard = document.createElement('div');
-                        newCard.className = `history-card ${leave.status ? leave.status.toLowerCase() : 'pending'}`;
-                        newCard.innerHTML = `
-                            <div class="history-details">
-                                <span class="history-type">${leave.type}</span>
-                                <span class="history-date">${leave.dateRange}</span>
-                                <span class="history-reason">Reason: ${leave.reason}</span>
-                                ${leave.hasMC ? `<span class="history-attachment-tag"><i class="fa-solid fa-paperclip"></i> ${leave.mcName}</span>` : ''}
-                            </div>
-                            <span class="history-badge ${leave.status ? leave.status.toLowerCase() : 'pending'}">${leave.status || 'Pending'}</span>
-                        `;
-                        listContainer.appendChild(newCard);
-                    });
-                }
-            });
+        function triggerBiometricVerify() {
+            const bioModal = document.getElementById('bio-modal');
+            bioModal.classList.add('show');
+            setTimeout(() => {
+                bioModal.classList.remove('show');
+                showToast("Biometric Scan Verified!", true);
+            }, 2000);
         }
 
-        /* ==================== AUTH HANDLERS ==================== */
+        function dismissBiometric() {
+            document.getElementById('bio-modal').classList.remove('show');
+        }
+
+        /* ==================== AUTHENTICATION ENGINE ==================== */
         function handleAuthSignup() {
             const fullName = document.getElementById('signup-name').value.trim();
             const email = document.getElementById('signup-email').value.trim();
@@ -1953,7 +2407,7 @@
                             password: pass,
                             name: fullName,
                             email: email,
-                            role: "Kitchen Floor Staff",
+                            role: "Kitchen Staff",
                             joinedAt: new Date().toLocaleDateString()
                         }).then(() => {
                             showToast("Account saved to Firebase Realtime DB!", true);
@@ -1966,7 +2420,7 @@
                     showToast("Username already registered.", false);
                     return;
                 }
-                mockUsers.push({ username: user, password: pass, name: fullName });
+                mockUsers.push({ username: user, password: pass, name: fullName, role: "Kitchen Staff", rate: "RM 14.50 / Hr" });
                 showToast("Account registered! Please sign in.", true);
                 completeSignupUI(user);
             }
@@ -2018,12 +2472,54 @@
         }
 
         function completeLoginUI() {
+            const isAdmin = (activeUsername.toLowerCase() === 'admin');
+            
             document.getElementById('welcome-username').textContent = `Hello, ${activeStaffName}!`;
             document.getElementById('profile-full-name').textContent = activeStaffName;
-            
+
+            renderDashboardForRole(isAdmin ? 'admin' : 'staff');
+
+            if (isAdmin) {
+                attachAdminRealtimeListeners();
+            } else {
+                attachRealtimeListeners(activeUsername);
+            }
+
             showToast("Authenticated successfully!", true);
-            attachRealtimeListeners(activeUsername);
-            setTimeout(() => navigateTo('dashboard-screen'), 1000);
+            setTimeout(() => navigateTo('dashboard-screen'), 600);
+        }
+
+        function renderDashboardForRole(role) {
+            const adminContainer = document.getElementById('admin-dashboard-container');
+            const staffContainer = document.getElementById('staff-dashboard-container');
+            const roleText = document.getElementById('welcome-user-role');
+            
+            // Header elements
+            const logoutBtn = document.getElementById('admin-logout-btn');
+            const userAvatar = document.getElementById('staff-user-avatar');
+
+            if (role === 'admin' || role === 'manager') {
+                adminContainer.style.display = 'flex';
+                staffContainer.style.display = 'none';
+                if (roleText) roleText.textContent = 'Administrator Control Workspace';
+
+                // Admin View: Show Logout Button, Hide Staff Avatar
+                if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+                if (userAvatar) userAvatar.style.display = 'none';
+
+                loadAdminKPIData();
+                renderBottomNav('admin');
+            } else {
+                adminContainer.style.display = 'none';
+                staffContainer.style.display = 'flex';
+                if (roleText) roleText.textContent = 'Welcome to your workspace';
+
+                // Staff View: Hide Logout Button, Show Staff Avatar
+                if (logoutBtn) logoutBtn.style.display = 'none';
+                if (userAvatar) userAvatar.style.display = 'flex';
+
+                renderBottomNav('staff');
+            }
         }
 
         function performLogOut() {
@@ -2056,6 +2552,7 @@
 
         function renderShiftLogs() {
             const listContainer = document.getElementById('shift-log-list');
+            if (!listContainer) return;
             listContainer.innerHTML = '';
 
             if (!shiftLogsArray || shiftLogsArray.length === 0) {
@@ -2103,6 +2600,8 @@
             const statusText = document.getElementById('status-text');
             const btn = document.getElementById('clock-btn');
 
+            if (!card || !btn) return;
+
             if (clockedIn) {
                 card.classList.remove('alert-active');
                 badge.className = "status-badge active";
@@ -2118,12 +2617,6 @@
             }
         }
 
-        /*
-            UPDATED SHIFT RULES IMPLEMENTATION:
-            1. Punch once per day, starting 8:00 AM until 8:00 PM.
-            2. Punch in AFTER 9:30 AM is LATE.
-            3. Punch out AFTER 8:00 PM calculates OT @ RM10/hour.
-        */
         function toggleShiftClock() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -2132,24 +2625,24 @@
             const safeUserKey = activeUsername.replace(/[.#$/[\]]/g, '_');
 
             if (!isClockedIn) {
-                // RULE 1: Punch once per day limit check
+                // Rule 1: One shift per day limit check
                 const todayShift = shiftLogsArray.find(s => s.date === todayStr);
                 if (todayShift && !todayShift.active) {
                     showToast("Only 1 shift punch allowed per day! Already completed today.", false);
                     return;
                 }
 
-                // RULE 1: Time Window Check (8:00 AM - 8:00 PM)
+                // Rule 1: Time Window Check (8:00 AM - 8:00 PM)
                 const currentMinutes = now.getHours() * 60 + now.getMinutes();
-                const startWindow = 8 * 60;   // 8:00 AM = 480 mins
-                const endWindow = 20 * 60;    // 8:00 PM = 1200 mins
+                const startWindow = 8 * 60;   // 8:00 AM
+                const endWindow = 20 * 60;    // 8:00 PM
 
                 if (currentMinutes < startWindow || currentMinutes > endWindow) {
-                    showToast("Clock-in is only permitted between 8:00 AM and 8:00 PM.", false);
+                    showToast("Clock-in permitted only between 8:00 AM and 8:00 PM.", false);
                     return;
                 }
 
-                // RULE 2: Late check (> 9:30 AM = 570 mins)
+                // Rule 2: Late check (> 9:30 AM)
                 const lateThreshold = 9 * 60 + 30; 
                 const isLate = currentMinutes > lateThreshold;
 
@@ -2173,6 +2666,8 @@
                     activeShiftKey = newShiftRef.key;
                     newShiftRef.set(newShift);
                 } else {
+                    activeShiftKey = 'local_' + Date.now();
+                    newShift.id = activeShiftKey;
                     shiftLogsArray.unshift(newShift);
                     renderShiftLogs();
                 }
@@ -2183,7 +2678,7 @@
                     showToast("Clock-in recorded on time!", true);
                 }
             } else {
-                // CLOCKING OUT LOGIC
+                // Clocking Out Logic
                 isClockedIn = false;
                 updateClockUIState(false);
 
@@ -2193,340 +2688,1053 @@
                 const remainingMins = diffMins % 60;
                 const durationText = `${hrs}h ${remainingMins}m`;
 
-                // RULE 3: Overtime calculation (Punch out AFTER 8:00 PM @ RM10/hour)
+                // Rule 3: OT Calculation (Punch out AFTER 8:00 PM @ RM10/hr)
                 const otThresholdTime = new Date(now);
-                otThresholdTime.setHours(20, 0, 0, 0); // 8:00 PM target
+                otThresholdTime.setHours(20, 0, 0, 0);
 
                 let otText = null;
                 if (now > otThresholdTime) {
                     const otMs = now - otThresholdTime;
                     const otMins = Math.floor(otMs / 60000);
-                    
                     if (otMins > 0) {
                         const otHoursDecimal = otMins / 60;
-                        const otRate = 10; // RM10 per hour
-                        const otAmount = otHoursDecimal * otRate;
-                        
-                        const otHrsInt = Math.floor(otMins / 60);
-                        const otMinsRem = otMins % 60;
-                        otText = `${otHrsInt}h ${otMinsRem}m (+RM${otAmount.toFixed(2)})`;
+                        otText = `${otHoursDecimal.toFixed(1)} hrs (RM ${(otHoursDecimal * 10).toFixed(2)})`;
                     }
                 }
 
                 if (isFirebaseConnected && db && activeShiftKey) {
-                    db.ref('shifts/' + safeUserKey + '/' + activeShiftKey).update({
+                    db.ref(`shifts/${safeUserKey}/${activeShiftKey}`).update({
                         out: timeStr,
                         duration: durationText,
                         ot: otText,
                         active: false
                     });
-                    activeShiftKey = null;
                 } else {
-                    if (shiftLogsArray.length > 0) {
-                        shiftLogsArray[0].out = timeStr;
-                        shiftLogsArray[0].duration = durationText;
-                        shiftLogsArray[0].ot = otText;
-                        shiftLogsArray[0].active = false;
+                    const currentShift = shiftLogsArray.find(s => s.active || s.id === activeShiftKey);
+                    if (currentShift) {
+                        currentShift.out = timeStr;
+                        currentShift.duration = durationText;
+                        currentShift.ot = otText;
+                        currentShift.active = false;
                     }
                     renderShiftLogs();
                 }
 
-                if (otText) {
-                    showToast(`Clocked Out with OT after 8:00 PM! ${otText}`, true);
-                } else {
-                    showToast("Shift summary finalized and logged!", true);
-                }
+                showToast("Clocked Out successfully!", true);
             }
         }
 
-        function triggerBiometricVerify() {
-            const bioModal = document.getElementById('bio-modal');
-            bioModal.classList.add('show');
-            showToast("Initializing physical biometrics scanner...", true);
-            
-            setTimeout(() => {
-                if (bioModal.classList.contains('show')) {
-                    dismissBiometric();
-                    showToast("Biometrics verified! Session integrity secured.", true);
+        /* ==================== REALTIME DATABASE LISTENERS ==================== */
+        function attachRealtimeListeners(username) {
+            if (!isFirebaseConnected || !db) return;
+            const safeUserKey = username.replace(/[.#$/[\]]/g, '_');
+
+            db.ref('shifts/' + safeUserKey).on('value', snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    const loadedLogs = [];
+                    Object.keys(data).forEach(key => {
+                        loadedLogs.push({ id: key, ...data[key] });
+                    });
+                    loadedLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    shiftLogsArray = loadedLogs;
+                    renderShiftLogs();
+
+                    const activeShift = loadedLogs.find(l => l.active);
+                    if (activeShift) {
+                        isClockedIn = true;
+                        activeShiftKey = activeShift.id;
+                        punchInTime = new Date(activeShift.timestamp);
+                        updateClockUIState(true);
+                    } else {
+                        isClockedIn = false;
+                        activeShiftKey = null;
+                        updateClockUIState(false);
+                    }
+                } else {
+                    shiftLogsArray = [];
+                    isClockedIn = false;
+                    activeShiftKey = null;
+                    updateClockUIState(false);
+                    renderShiftLogs();
                 }
-            }, 2500);
+            });
         }
 
-        function dismissBiometric() {
-            document.getElementById('bio-modal').classList.remove('show');
+        /* ==================== PROMOTION SLIDER ==================== */
+        function initPromoSlider() {
+            promoAutoplayTimer = setInterval(() => {
+                setPromoSlide((currentPromoIndex + 1) % 2);
+            }, 4500);
         }
 
-        /* ==================== LEAVE HANDLING ==================== */
+        function setPromoSlide(index) {
+            currentPromoIndex = index;
+            const slides = document.querySelectorAll('.promo-card');
+            const dots = document.querySelectorAll('.promo-dot');
+
+            slides.forEach((slide, idx) => {
+                if (idx === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            dots.forEach((dot, idx) => {
+                if (idx === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        /* ==================== LEAVE APPLICATION LOGIC ==================== */
         function toggleMCOption() {
-            const selection = document.getElementById('leave-type').value;
+            const leaveType = document.getElementById('leave-type').value;
             const mcBlock = document.getElementById('mc-block');
-            if (selection === "Medical / Sick Leave") {
-                mcBlock.style.display = "flex";
-                setTimeout(() => mcBlock.classList.add('show'), 10);
+            if (leaveType.includes("Sick") || leaveType.includes("Medical")) {
+                mcBlock.classList.add('show');
             } else {
                 mcBlock.classList.remove('show');
-                setTimeout(() => mcBlock.style.display = "none", 300);
             }
         }
 
         function handleFileAttach() {
             const input = document.getElementById('mc-file-input');
+            const preview = document.getElementById('file-preview-capsule');
+            const nameLabel = document.getElementById('attached-file-name');
+
             if (input.files && input.files[0]) {
-                document.getElementById('attached-file-name').textContent = input.files[0].name;
-                document.getElementById('file-preview-capsule').style.display = "flex";
+                attachedFileName = input.files[0].name;
+                nameLabel.textContent = attachedFileName;
+                preview.style.display = 'flex';
             }
         }
 
         function clearAttachedFile() {
             document.getElementById('mc-file-input').value = '';
-            document.getElementById('file-preview-capsule').style.display = "none";
+            document.getElementById('file-preview-capsule').style.display = 'none';
+            attachedFileName = null;
         }
 
         function handleLeaveSubmit(e) {
             e.preventDefault();
-            const leaveType = document.getElementById('leave-type').value;
-            const startStr = document.getElementById('start-date').value;
-            const endStr = document.getElementById('end-date').value;
-            const reason = document.getElementById('leave-reason').value.trim();
+            const type = document.getElementById('leave-type').value;
+            const start = document.getElementById('start-date').value;
+            const end = document.getElementById('end-date').value;
+            const reason = document.getElementById('leave-reason').value;
 
-            const d1 = new Date(startStr);
-            const d2 = new Date(endStr);
-            const diffTime = Math.abs(d2 - d1);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-            const options = { month: 'short', day: '2-digit', year: 'numeric' };
-            const dateRangeText = `${d1.toLocaleDateString('en-US', options)} - ${d2.toLocaleDateString('en-US', options)} (${diffDays} days)`;
-
-            let hasMC = false;
-            let mcName = "";
-            if (leaveType === "Medical / Sick Leave" && document.getElementById('mc-file-input').files[0]) {
-                hasMC = true;
-                mcName = document.getElementById('mc-file-input').files[0].name;
+            if (!start || !end || !reason) {
+                showToast("Please fill in all leave request details.", false);
+                return;
             }
 
-            const newLeaveRecord = {
-                type: leaveType,
-                dateRange: dateRangeText,
+            const safeUserKey = activeUsername.replace(/[.#$/[\]]/g, '_');
+            const leavePayload = {
+                username: activeUsername,
+                staffName: activeStaffName,
+                type: type,
+                dateRange: `${start} to ${end}`,
                 reason: reason,
-                hasMC: hasMC,
-                mcName: mcName,
                 status: "Pending",
-                createdAt: Date.now()
+                hasMC: !!attachedFileName,
+                mcName: attachedFileName || null,
+                timestamp: Date.now()
             };
+
+            if (isFirebaseConnected && db) {
+                db.ref('leaves/' + safeUserKey).push(leavePayload).then(() => {
+                    showToast("Leave request submitted successfully!", true);
+                    resetLeaveForm();
+                });
+            } else {
+                showToast("Leave request filed (Local Mode)!", true);
+                resetLeaveForm();
+            }
+        }
+
+        function resetLeaveForm() {
+            document.getElementById('leave-form').reset();
+            clearAttachedFile();
+            toggleMCOption();
+        }
+
+        function loadStaffLeaveLogs() {
+            if (!activeUsername) return;
+            const safeUserKey = activeUsername.replace(/[.#$/[\]]/g, '_');
+
+            if (isFirebaseConnected && db) {
+                db.ref('leaves/' + safeUserKey).on('value', snapshot => {
+                    const data = snapshot.val();
+                    renderLeaveHistoryCards(data);
+                });
+            } else {
+                renderLeaveHistoryCards(null);
+            }
+        }
+
+        function renderLeaveHistoryCards(data) {
+            const listContainer = document.getElementById('leave-history-list');
+            if (!listContainer) return;
+            listContainer.innerHTML = '';
+
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    const leave = data[key];
+                    const card = document.createElement('div');
+                    card.className = `history-card ${(leave.status || 'pending').toLowerCase()}`;
+                    card.innerHTML = `
+                        <div class="history-details">
+                            <span class="history-type">${leave.type}</span>
+                            <span class="history-date">${leave.dateRange}</span>
+                            <span class="history-reason">Reason: ${leave.reason}</span>
+                            ${leave.hasMC ? `<span class="history-attachment-tag"><i class="fa-solid fa-paperclip"></i> ${leave.mcName}</span>` : ''}
+                        </div>
+                        <span class="history-badge ${(leave.status || 'pending').toLowerCase()}">${leave.status || 'Pending'}</span>
+                    `;
+                    listContainer.appendChild(card);
+                });
+            } else {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; color: #888; font-size: 11px; padding: 18px 0; font-weight: 600;">
+                        <i class="fa-regular fa-folder-open" style="font-size: 20px; margin-bottom: 6px; display: block; color: #d1232a; opacity: 0.6;"></i>
+                        No leave requests recorded yet
+                    </div>
+                `;
+            }
+        }
+
+        /* ==================== PROFILE ENGINE ==================== */
+        function loadStaffProfileInfo() {
+            const user = mockUsers.find(u => u.username === activeUsername) || { role: "Kitchen Staff", rate: "RM 14.50 / Hr" };
+            document.getElementById('profile-full-name').textContent = activeStaffName;
+            document.getElementById('profile-role-badge').textContent = user.role || "Kitchen Staff";
+            document.getElementById('profile-staff-id').textContent = `HMZ-${activeUsername.toUpperCase()}`;
+            document.getElementById('profile-rate').textContent = user.rate || "RM 14.50 / Hr";
+
+            // Calculate estimated accrued earnings
+            const activeHours = shiftLogsArray.length * 8; // simplified estimate
+            document.getElementById('profile-accrued-amount').textContent = `RM ${(activeHours * 14.50).toFixed(2)}`;
+        }
+
+        /* ==================== PAYSLIP & PDF GENERATION ==================== */
+        function loadStaffPayslips() {
+            const selector = document.getElementById('payslip-selector');
+            if (!selector) return;
 
             const safeUserKey = activeUsername.replace(/[.#$/[\]]/g, '_');
 
             if (isFirebaseConnected && db) {
-                db.ref('leaves/' + safeUserKey).push(newLeaveRecord);
+                db.ref(`salarySlips/${safeUserKey}`).on('value', snapshot => {
+                    const slips = snapshot.val() || {};
+                    populatePayslipDropdown(slips);
+                });
             } else {
-                const newCard = document.createElement('div');
-                newCard.className = "history-card pending";
-                newCard.innerHTML = `
-                    <div class="history-details">
-                        <span class="history-type">${leaveType}</span>
-                        <span class="history-date">${dateRangeText}</span>
-                        <span class="history-reason">Reason: ${reason}</span>
-                        ${hasMC ? `<span class="history-attachment-tag"><i class="fa-solid fa-paperclip"></i> ${mcName}</span>` : ''}
-                    </div>
-                    <span class="history-badge pending">Pending</span>
-                `;
-                document.getElementById('leave-history-list').prepend(newCard);
-            }
-
-            if (leaveType === "Medical / Sick Leave") {
-                sickLeaveLeft = Math.max(0, sickLeaveLeft - Math.round(diffDays * 5.0));
-                document.getElementById('bal-sick').textContent = `${sickLeaveLeft}%`;
-                document.getElementById('circle-sick').style.setProperty('--percent', sickLeaveLeft);
-            } else if (leaveType === "Casual Leave") {
-                casualLeaveLeft = Math.max(0, casualLeaveLeft - Math.round(diffDays * 10.0));
-                document.getElementById('bal-casual').textContent = `${casualLeaveLeft}%`;
-                document.getElementById('circle-casual').style.setProperty('--percent', casualLeaveLeft);
-            } else if (leaveType === "Unpaid Leave") {
-                unpaidLeaveLeft = Math.max(0, unpaidLeaveLeft - Math.round(diffDays * 15.0));
-                document.getElementById('bal-unpaid').textContent = `${unpaidLeaveLeft}%`;
-                document.getElementById('circle-unpaid').style.setProperty('--percent', unpaidLeaveLeft);
-            }
-
-            document.getElementById('leave-form').reset();
-            clearAttachedFile();
-            toggleMCOption();
-            
-            showToast("Leave request submitted successfully!", true);
-        }
-
-        /* ==================== PAYROLL & BROADCAST CAROUSEL ==================== */
-        function updatePayslipContentView() {
-            const choice = document.getElementById('payslip-selector').value;
-            const header = document.getElementById('payslip-main-header');
-            const otLabel = document.getElementById('payslip-ot-label');
-            const otVal = document.getElementById('payslip-ot-val');
-            const netVal = document.getElementById('payslip-net-amount');
-
-            header.textContent = `Earnings Overview - ${choice}`;
-            if (choice === "March 2026") {
-                otLabel.textContent = "Overtime Hours (12h x RM10.00)";
-                otVal.textContent = "RM 120.00";
-                netVal.textContent = "RM 2,369.40";
-            } else if (choice === "February 2026") {
-                otLabel.textContent = "Overtime Hours (0h)";
-                otVal.textContent = "RM 0.00";
-                netVal.textContent = "RM 2,195.15";
-            } else {
-                otLabel.textContent = "Overtime Hours (8h x RM10.00)";
-                otVal.textContent = "RM 80.00";
-                netVal.textContent = "RM 2,308.51";
+                populatePayslipDropdown({
+                    "2026-07": { basic: 2800, allowance: 200, bonus: 150, deduction: 330, netPay: 2820 }
+                });
             }
         }
 
-        function selectArchivedPayslipIndex(month) {
-            document.getElementById('payslip-selector').value = month;
+        function populatePayslipDropdown(slips) {
+            const selector = document.getElementById('payslip-selector');
+            selector.innerHTML = '';
+            const months = Object.keys(slips);
+
+            if (months.length === 0) {
+                selector.innerHTML = '<option value="">No Payslips Available</option>';
+                updatePayslipUI({ basic: 0, allowance: 0, bonus: 0, deduction: 0, netPay: 0 });
+                return;
+            }
+
+            months.forEach(monthKey => {
+                const opt = document.createElement('option');
+                opt.value = monthKey;
+                opt.textContent = `Pay Period: ${monthKey}`;
+                selector.appendChild(opt);
+            });
+
             updatePayslipContentView();
-            showToast(`Loaded ${month} transaction sheet logs.`, true);
         }
 
-        // ==================== PDF GENERATION ENGINE ====================
+        function updatePayslipContentView() {
+            const monthKey = document.getElementById('payslip-selector').value;
+            if (!monthKey) return;
+            const safeUserKey = activeUsername.replace(/[.#$/[\]]/g, '_');
+
+            if (isFirebaseConnected && db) {
+                db.ref(`salarySlips/${safeUserKey}/${monthKey}`).once('value', snapshot => {
+                    updatePayslipUI(snapshot.val() || {});
+                });
+            } else {
+                updatePayslipUI({ basic: 2800, allowance: 200, bonus: 150, deduction: 330, netPay: 2820 });
+            }
+        }
+
+        function updatePayslipUI(slip) {
+            document.getElementById('payslip-basic-val').textContent = `RM ${(slip.basic || 0).toFixed(2)}`;
+            document.getElementById('payslip-allowance-val').textContent = `RM ${((slip.allowance || 0) + (slip.bonus || 0)).toFixed(2)}`;
+            document.getElementById('payslip-deduction-val').textContent = `-RM ${(slip.deduction || 0).toFixed(2)}`;
+            document.getElementById('payslip-net-amount').textContent = `RM ${(slip.netPay || 0).toFixed(2)}`;
+        }
+
         function generatePayslipPDF() {
-            showToast("Compiling secure payroll transaction PDF...", true);
-            
-            const targetCycle = document.getElementById('payslip-selector').value;
-            const netAmount = document.getElementById('payslip-net-amount').textContent;
-            const otValue = document.getElementById('payslip-ot-val').textContent;
-            const otDescription = document.getElementById('payslip-ot-label').textContent;
-
+            const monthKey = document.getElementById('payslip-selector').value || "2026-07";
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const doc = new jsPDF();
 
-            doc.setFillColor(230, 28, 36); 
-            doc.rect(0, 0, 210, 42, 'F');
-
+            doc.setFillColor(230, 28, 36);
+            doc.rect(0, 0, 210, 30, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(22);
-            doc.text("HEMZAL CRISPY CHICKEN", 14, 18);
-            
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text("Corporate Staff Payroll Statement & Settlement Ledger", 14, 26);
-            doc.text(`Timeline Code: ${new Date().toLocaleString()}`, 14, 32);
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.text("HEMZAL CRISPY CHICKEN", 14, 20);
 
-            doc.setTextColor(30, 30, 30);
-            doc.setFont("Helvetica", "bold");
+            doc.setTextColor(50, 50, 50);
             doc.setFontSize(12);
-            doc.text("STAFF IDENTIFICATION DATA", 14, 55);
-            doc.setDrawColor(230, 28, 36);
-            doc.setLineWidth(0.5);
-            doc.line(14, 57, 196, 57);
-
-            doc.setFont("Helvetica", "normal");
+            doc.text(`Official Salary Statement - ${monthKey}`, 14, 42);
             doc.setFontSize(10);
-            doc.text(`Staff Full Name:    ${activeStaffName}`, 14, 66);
-            doc.text("Employee ID:        EM-2026-089", 14, 72);
-            doc.text("Assigned Branch:    Ampang Jaya Branch", 14, 78);
-            doc.text(`Settlement Cycle:   ${targetCycle}`, 14, 84);
+            doc.text(`Employee: ${activeStaffName} (${activeUsername})`, 14, 50);
+            doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 14, 56);
 
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("ITEMIZED PAYSLIP EARNINGS", 14, 100);
-            doc.setDrawColor(200, 200, 200);
-            doc.line(14, 102, 196, 102);
+            const basic = document.getElementById('payslip-basic-val').textContent;
+            const allowance = document.getElementById('payslip-allowance-val').textContent;
+            const deduction = document.getElementById('payslip-deduction-val').textContent;
+            const net = document.getElementById('payslip-net-amount').textContent;
 
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text("Regular Hours Rate (160h x RM14.50)", 14, 110);
-            doc.text("RM 2,320.00", 196, 110, { align: 'right' });
+            doc.autoTable({
+                startY: 65,
+                head: [['Earnings & Deductions Description', 'Amount (MYR)']],
+                body: [
+                    ['Basic Monthly Salary', basic],
+                    ['Allowances & Overtime', allowance],
+                    ['Statutory Deductions (EPF/SOCSO)', deduction],
+                    ['TOTAL NET PAYOUT', net]
+                ],
+                headStyles: { fillStyle: [230, 28, 36], textColor: [255, 255, 255], fontStyle: 'bold' }
+            });
 
-            doc.text(otDescription, 14, 117);
-            doc.text(otValue, 196, 117, { align: 'right' });
-
-            doc.text("Performance Allowance Incentive", 14, 124);
-            doc.text("RM 200.00", 196, 124, { align: 'right' });
-
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("STATUTORY TAXES & DEDUCTIONS", 14, 139);
-            doc.line(14, 141, 196, 141);
-
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text("EPF Staff Contribution (11%)", 14, 149);
-            doc.text("-RM 274.34", 196, 149, { align: 'right' });
-
-            doc.text("SOCSO Insurance Deduction", 14, 156);
-            doc.text("-RM 12.45", 196, 156, { align: 'right' });
-
-            doc.text("EIS Employment Loss Protection", 14, 163);
-            doc.text("-RM 4.70", 196, 163, { align: 'right' });
-
-            doc.setFillColor(255, 213, 0); 
-            doc.rect(14, 175, 182, 16, 'F');
-            
-            doc.setTextColor(30, 30, 30);
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("NET DISBURSED OUTFLOW SUM:", 20, 185);
-            doc.setFontSize(13);
-            doc.text(netAmount, 190, 185, { align: 'right' });
-
-            doc.setTextColor(130, 130, 130);
-            doc.setFont("Helvetica", "oblique");
-            doc.setFontSize(8.5);
-            doc.text("Disclaimer: This document is a systematically verified ledger. No handwritten seal authentication is required.", 14, 210);
-
-            const formattedFileName = `Hemzal_Payslip_${targetCycle.replace(/\s+/g, '_')}_${activeStaffName.replace(/\s+/g, '_')}.pdf`;
-            doc.save(formattedFileName);
+            doc.save(`Payslip_${activeUsername}_${monthKey}.pdf`);
+            showToast("PDF Document Downloaded!", true);
         }
 
-        // Promotions Slide Auto-Carousel Loop Logic
-        function setPromoSlide(index) {
-            const totalPromoSlides = 2; 
-            let previousIndex = currentPromoIndex;
-            
-            if (index >= totalPromoSlides) currentPromoIndex = 0;
-            else if (index < 0) currentPromoIndex = totalPromoSlides - 1;
-            else currentPromoIndex = index;
+        /* ==================== ADMIN PANEL LOGIC ==================== */
 
-            for (let i = 0; i < totalPromoSlides; i++) {
-                const cardEl = document.getElementById(`promo-slide-${i}`);
-                const dotEl = document.querySelectorAll('.promo-dots .promo-dot')[i];
+        // Global cache for nested leave requests
+        let cachedLeavesData = {};
+        let currentAdminLeaveFilter = 'all';
+
+        function loadAdminKPIData() {
+            document.getElementById('admin-total-staff').textContent = "12 Members";
+            document.getElementById('admin-clocked-in-status').textContent = "● 8 Clocked-In Today";
+            document.getElementById('admin-today-sales').textContent = "RM 3,450.00";
+            initSalesChart();
+        }
+
+        function attachAdminRealtimeListeners() {
+            if (typeof isFirebaseConnected !== 'undefined' && isFirebaseConnected && db) {
+                db.ref('users').on('value', snapshot => {
+                    const count = snapshot.numChildren() || 12;
+                    document.getElementById('admin-total-staff').textContent = `${count} Members`;
+                });
+            }
+        }
+
+        function initSalesChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+
+            if (typeof salesChartInstance !== 'undefined' && salesChartInstance) {
+                salesChartInstance.destroy();
+            }
+
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Sales (RM)',
+                        data: [2100, 2800, 2400, 3100, 4200, 5100, 3450],
+                        borderColor: '#E61C24',
+                        backgroundColor: 'rgba(230, 28, 36, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        /**
+         * Loads all nested staff leave requests from Firebase: leaves/{userKey}/{leaveId}
+         */
+        function loadAllStaffLeaveRequests() {
+            // Check both possible container IDs to prevent blank screens
+            const container = document.getElementById('admin-leave-requests-list') || document.getElementById('admin-leave-list-container');
+            if (!container) return;
+
+            // Apply scrollable container styles dynamically
+            container.style.maxHeight = "calc(100vh - 220px)";
+            container.style.overflowY = "auto";
+            container.style.display = "flex";
+            container.style.flexDirection = "column";
+            container.style.gap = "10px";
+            container.style.paddingBottom = "15px";
+
+            container.innerHTML = `
+                <div style="text-align: center; color: #888; padding: 20px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 20px; color: #d1232a;"></i>
+                    <p style="margin-top: 6px; font-size: 11px; font-weight: 700;">Loading requests...</p>
+                </div>
+            `;
+
+            if (typeof isFirebaseConnected !== 'undefined' && isFirebaseConnected && db) {
+                db.ref('leaves').on('value', snapshot => {
+                    cachedLeavesData = snapshot.val() || {};
+                    renderAdminLeaveList(container, cachedLeavesData, currentAdminLeaveFilter);
+                }, error => {
+                    console.error("Firebase fetch error:", error);
+                    renderAdminLeaveList(container, getDemoLeaveData(), currentAdminLeaveFilter);
+                });
+            } else {
+                cachedLeavesData = getDemoLeaveData();
+                renderAdminLeaveList(container, cachedLeavesData, currentAdminLeaveFilter);
+            }
+        }
+
+        /**
+         * Renders the list of leave requests based on active filter
+         */
+        function renderAdminLeaveList(container, allLeaves, filter) {
+            container.innerHTML = '';
+            let cardCount = 0;
+
+            if (!allLeaves || Object.keys(allLeaves).length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888; font-size:12px; padding:20px;">No leave requests found.</p>';
+                return;
+            }
+
+            Object.keys(allLeaves).forEach(userKey => {
+                const userLeaves = allLeaves[userKey];
+                if (!userLeaves) return;
+
+                Object.keys(userLeaves).forEach(leaveId => {
+                    const l = userLeaves[leaveId];
+                    const status = l.status || 'Pending';
+
+                    // Filter check
+                    if (filter !== 'all' && status.toLowerCase() !== filter.toLowerCase()) {
+                        return;
+                    }
+
+                    cardCount++;
+                    renderAdminLeaveRow(container, userKey, leaveId, l);
+                });
+            });
+
+            if (cardCount === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#888; font-size:12px; padding:20px;">No ${filter} leave requests.</p>`;
+            }
+        }
+
+        /**
+         * Creates individual leave item card
+         */
+        function renderAdminLeaveRow(container, userKey, leaveId, l) {
+            const card = document.createElement('div');
+            const status = l.status || 'Pending';
+            const leaveType = l.type || 'Leave Request';
+
+            let badgeBg = '#FFF3C7', badgeColor = '#D97706', borderColor = '#F59E0B';
+            if (status === 'Approved') { badgeBg = '#DEF7EC'; badgeColor = '#03543F'; borderColor = '#10B981'; }
+            else if (status === 'Rejected') { badgeBg = '#FDE8E8'; badgeColor = '#9B1C1C'; borderColor = '#EF4444'; }
+
+            card.style.cssText = `background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 6px; border-left: 4px solid ${borderColor};`;
+
+            // Escaped string for inline onclick safety
+            const safeType = leaveType.replace(/'/g, "\\'");
+
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 13px; color: #1e1e1e;">${l.staffName || userKey}</strong>
+                    <span style="font-size: 10px; font-weight: 800; background: ${badgeBg}; color: ${badgeColor}; padding: 2px 8px; border-radius: 10px;">
+                        ${status}
+                    </span>
+                </div>
+                <span style="font-size: 11px; color: #333; font-weight: 700;">${leaveType} (${l.dateRange || 'N/A'})</span>
+                <span style="font-size: 10px; color: #666; font-style: italic;">Reason: "${l.reason || 'No reason provided'}"</span>
                 
-                if (cardEl && dotEl) {
-                    cardEl.classList.remove('active', 'slide-left-out');
-                    dotEl.classList.remove('active');
-                    
-                    if (i === currentPromoIndex) {
-                        cardEl.classList.add('active');
-                        dotEl.classList.add('active');
-                    } else if (i === previousIndex) {
-                        cardEl.classList.add('slide-left-out');
+                ${status === 'Pending' ? `
+                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                    <button onclick="updateLeaveStatus('${userKey}', '${leaveId}', 'Approved', '${safeType}')" style="flex: 1; background: #10B981; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer;">
+                        <i class="fa-solid fa-check"></i> Approve
+                    </button>
+                    <button onclick="updateLeaveStatus('${userKey}', '${leaveId}', 'Rejected', '${safeType}')" style="flex: 1; background: #EF4444; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer;">
+                        <i class="fa-solid fa-xmark"></i> Reject
+                    </button>
+                </div>` : ''}
+            `;
+
+            container.appendChild(card);
+        }
+
+        /**
+         * Filter leaves by status (All, Pending, Approved, Rejected)
+         */
+        function filterLeaveRequests(statusType) {
+            currentAdminLeaveFilter = statusType;
+            const container = document.getElementById('admin-leave-requests-list') || document.getElementById('admin-leave-list-container');
+            if (container) {
+                renderAdminLeaveList(container, cachedLeavesData, currentAdminLeaveFilter);
+            }
+        }
+
+        /**
+         * Updates leave status in Firebase and sends push notification payload
+         */
+        function updateLeaveStatus(userKey, leaveId, newStatus, leaveType = 'Leave Request') {
+            if (!leaveId || !userKey) {
+                showToast("Error: Invalid request parameter.", false);
+                return;
+            }
+
+            if (typeof isFirebaseConnected !== 'undefined' && isFirebaseConnected && typeof db !== 'undefined') {
+                // 1. Update the leave status in Firebase (Adjust path if leaves are nested inside user nodes)
+                db.ref('leaveRequests/' + leaveId).update({
+                    status: newStatus,
+                    updatedAt: new Date().toISOString()
+                }).then(() => {
+                    showToast(`Leave request ${newStatus.toLowerCase()} successfully!`, true);
+
+                    // 2. Queue notification for the selected staff member
+                    sendNotificationToStaff(userKey, newStatus, leaveType);
+
+                }).catch(err => {
+                    console.error("Firebase status update error:", err);
+                    showToast("Failed to update status in Firebase.", false);
+                });
+            } else {
+                showToast(`Leave request ${newStatus.toLowerCase()} locally!`, true);
+            }
+        }
+
+        /**
+         * Pushes a notification entry to Firebase under: notifications/{userKey}
+         */
+        function sendNotificationToStaff(userKey, status, leaveType) {
+            const isApproved = status === 'Approved';
+
+            const payload = {
+                title: `Leave Request ${status}`,
+                message: `Your request for "${leaveType}" has been ${status.toLowerCase()} by Admin.`,
+                type: isApproved ? 'success' : 'error',
+                timestamp: Date.now(),
+                read: false
+            };
+
+            db.ref(`notifications/${userKey}`).push().set(payload)
+                .then(() => {
+                    console.log(`Push notification sent to: notifications/${userKey}`);
+                })
+                .catch(err => {
+                    console.error("Failed to push notification:", err);
+                });
+        }
+
+        /**
+         * Helper for demo data when offline
+         */
+        function getDemoLeaveData() {
+            return {
+                "staff1": {
+                    "demo1": {
+                        staffName: "Siti Nurhaliza",
+                        type: "Medical / Sick Leave",
+                        dateRange: "2026-08-04 to 2026-08-05",
+                        reason: "Fever and doctor rest advice",
+                        status: "Pending"
+                    }
+                },
+                "staff2": {
+                    "demo2": {
+                        staffName: "Ahmad Zaki",
+                        type: "Annual Leave",
+                        dateRange: "2026-08-10 to 2026-08-12",
+                        reason: "Family vacation",
+                        status: "Pending"
                     }
                 }
+            };
+        }
+
+        function populateSalaryStaffDropdown() {
+            const select = document.getElementById('salary-staff-select');
+            if (!select) return;
+            select.innerHTML = '';
+
+            mockUsers.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.username;
+                opt.textContent = `${u.name} (${u.username})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function saveStaffSalarySlip(e) {
+            e.preventDefault();
+            const staff = document.getElementById('salary-staff-select').value;
+            const month = document.getElementById('salary-month').value;
+            const basic = parseFloat(document.getElementById('salary-basic').value) || 0;
+            const allowance = parseFloat(document.getElementById('salary-allowance').value) || 0;
+            const deduction = parseFloat(document.getElementById('salary-deduction').value) || 0;
+            const bonus = parseFloat(document.getElementById('salary-bonus').value) || 0;
+
+            const netPay = (basic + allowance + bonus) - deduction;
+            const safeUserKey = staff.replace(/[.#$/[\]]/g, '_');
+
+            const payload = { basic, allowance, deduction, bonus, netPay, publishedAt: Date.now() };
+
+            if (isFirebaseConnected && db) {
+                db.ref(`salarySlips/${safeUserKey}/${month}`).set(payload).then(() => {
+                    showToast("Salary Slip Published to Firebase!", true);
+                });
+            } else {
+                showToast("Salary Slip Published (Local)!", true);
             }
-            restartPromoTimer();
         }
 
-        function startPromoCarousel() {
-            promoAutoplayTimer = setInterval(() => {
-                setPromoSlide(currentPromoIndex + 1);
-            }, 6000); 
+        /* Cache to hold retrieved staff data */
+        let cachedStaffList = {};
+
+        /**
+         * Loads all staff profiles from Firebase Realtime Database
+         */
+        function loadStaffProfiles() {
+            const container = document.getElementById('staff-list-container');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div style="text-align: center; color: #888; padding: 20px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #d1232a;"></i>
+                    <p style="margin-top: 8px; font-size: 12px; font-weight: 700;">Fetching staff profiles...</p>
+                </div>
+            `;
+
+            if (isFirebaseConnected && db) {
+                db.ref('users').on('value', snapshot => {
+                    const data = snapshot.val();
+                    cachedStaffList = data || {};
+                    renderStaffCards(cachedStaffList);
+                }, error => {
+                    console.error("Error loading staff:", error);
+                    showToast("Failed to load staff profiles from Firebase.", false);
+                });
+            } else {
+                // Fallback to local mock data if database is not active
+                cachedStaffList = {};
+                if (typeof mockUsers !== 'undefined') {
+                    mockUsers.forEach(user => {
+                        const cleanKey = user.username.toLowerCase().replace(/[.#$/[\]]/g, '_');
+                        cachedStaffList[cleanKey] = {
+                            username: user.username,
+                            name: user.name,
+                            email: `${user.username}@hemzal.com`,
+                            role: user.role,
+                            rate: user.rate || "RM 14.50 / Hr",
+                            outlet: "Ampang Jaya Branch",
+                            joinedAt: "Jan 01, 2026"
+                        };
+                    });
+                }
+                renderStaffCards(cachedStaffList);
+            }
         }
 
-        function restartPromoTimer() {
-            clearInterval(promoAutoplayTimer);
-            startPromoCarousel();
+        /**
+         * Renders staff profile cards into the DOM (Updated with Delete Button)
+         */
+        function renderStaffCards(staffData) {
+            const container = document.getElementById('staff-list-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const keys = Object.keys(staffData);
+            if (keys.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #888; font-size: 12px; padding: 20px;">
+                        No staff members found.
+                    </div>
+                `;
+                return;
+            }
+
+            keys.forEach(key => {
+                const staff = staffData[key];
+                const card = document.createElement('div');
+                card.className = "staff-card-item";
+                card.setAttribute('data-search', `${staff.name || ''} ${staff.role || ''} ${staff.username || ''}`.toLowerCase());
+                card.style.cssText = "background: white; border-radius: 16px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 8px; border-left: 4px solid #d1232a;";
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 40px; height: 40px; background: #FFEAA1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d1232a; font-size: 18px; font-weight: 800;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 14px; font-weight: 800; color: #1e1e1e; margin: 0;">${staff.name || staff.username}</h4>
+                                <span style="font-size: 10px; font-weight: 800; background: #FFF3C7; color: #D97706; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 2px;">
+                                    ${staff.role || 'Staff Member'}
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Action Buttons: Edit & Delete -->
+                        <div style="display: flex; gap: 6px;">
+                            <button onclick="openEditStaffModal('${key}')" style="background: #FFD500; color: #1e1e1e; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                            <button onclick="deleteStaffProfile('${key}')" style="background: #FEE2E2; color: #DC2626; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-trash-can"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #FFFDF5; padding: 8px 10px; border-radius: 10px; border: 1px solid #FFEAA1; font-size: 11px; margin-top: 4px;">
+                        <div><strong style="color: #666; font-size: 9px; text-transform: uppercase;">Username:</strong> <br><span style="color: #222; font-weight: 700;">@${staff.username || key}</span></div>
+                        <div><strong style="color: #666; font-size: 9px; text-transform: uppercase;">Rate:</strong> <br><span style="color: #10B981; font-weight: 800;">${staff.rate || 'RM 14.50 / Hr'}</span></div>
+                        <div><strong style="color: #666; font-size: 9px; text-transform: uppercase;">Email:</strong> <br><span style="color: #222; font-weight: 600; font-size: 10px;">${staff.email || 'N/A'}</span></div>
+                        <div><strong style="color: #666; font-size: 9px; text-transform: uppercase;">Outlet:</strong> <br><span style="color: #222; font-weight: 600;">${staff.outlet || 'Ampang Jaya Branch'}</span></div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
         }
 
-        window.onload = function() {
+        /**
+         * Filter staff list using search bar
+         */
+        function filterStaffList() {
+            const query = document.getElementById('staff-search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.staff-card-item');
+
+            cards.forEach(card => {
+                const text = card.getAttribute('data-search') || '';
+                if (text.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // ==========================================
+        // ADD STAFF MODAL & LOGIC
+        // ==========================================
+
+        function openAddStaffModal() {
+            const modal = document.getElementById('add-staff-modal');
+            if (modal) modal.classList.add('show');
+        }
+
+        function closeAddStaffModal() {
+            const modal = document.getElementById('add-staff-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                const form = document.getElementById('add-staff-form');
+                if (form) form.reset();
+            }
+        }
+
+        /**
+         * Creates a new staff profile in Firebase or local cache
+         */
+        function saveNewStaffProfile(event) {
+            event.preventDefault();
+
+            const usernameRaw = document.getElementById('add-staff-username').value.trim();
+            const cleanKey = usernameRaw.toLowerCase().replace(/[.#$/[\]]/g, '_');
+
+            const newStaffData = {
+                name: document.getElementById('add-staff-name').value.trim(),
+                username: usernameRaw,
+                email: document.getElementById('add-staff-email').value.trim(),
+                role: document.getElementById('add-staff-role').value,
+                rate: document.getElementById('add-staff-rate').value.trim(),
+                outlet: document.getElementById('add-staff-outlet').value.trim(),
+                joinedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+            };
+
+            if (isFirebaseConnected && db) {
+                db.ref('users/' + cleanKey).set(newStaffData).then(() => {
+                    showToast("New staff added to Firebase!", true);
+                    closeAddStaffModal();
+                }).catch(err => {
+                    console.error("Firebase create error:", err);
+                    showToast("Error saving staff to Firebase.", false);
+                });
+            } else {
+                // Fallback local addition
+                cachedStaffList[cleanKey] = newStaffData;
+                renderStaffCards(cachedStaffList);
+                showToast("New staff added locally!", true);
+                closeAddStaffModal();
+            }
+        }
+
+        // ==========================================
+        // EDIT STAFF MODAL & LOGIC
+        // ==========================================
+
+        /* ==================== STAFF MODAL CONTROLLERS ==================== */
+
+        // Add Staff Modal
+        function openAddStaffModal() {
+            const modal = document.getElementById('add-staff-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Delay adding .show slightly to trigger the opacity transition
+                setTimeout(() => modal.classList.add('show'), 10);
+            }
+        }
+
+        function closeAddStaffModal() {
+            const modal = document.getElementById('add-staff-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                document.getElementById('add-staff-form').reset();
+            }
+        }
+
+        // Edit Staff Modal
+        function openEditStaffModal(userKey) {
+            // 1. Fetch the staff object from your cache using the key
+            const staffData = cachedStaffList[userKey];
+
+            if (!staffData) {
+                console.error("Staff profile not found for key:", userKey);
+                showToast("Error loading staff details.", false);
+                return;
+            }
+
+            const modal = document.getElementById('edit-staff-modal');
+            if (modal) {
+                // 2. Populate the hidden key input and all fields
+                if (document.getElementById('edit-staff-key')) {
+                    document.getElementById('edit-staff-key').value = userKey;
+                }
+                document.getElementById('edit-staff-name').value = staffData.name || '';
+                document.getElementById('edit-staff-username').value = staffData.username || userKey;
+                document.getElementById('edit-staff-email').value = staffData.email || '';
+                document.getElementById('edit-staff-role').value = staffData.role || 'Kitchen Staff';
+                document.getElementById('edit-staff-rate').value = staffData.rate || '';
+                document.getElementById('edit-staff-outlet').value = staffData.outlet || '';
+
+                // 3. Display modal
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+            }
+        }
+
+        function closeEditStaffModal() {
+            const modal = document.getElementById('edit-staff-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                document.getElementById('edit-staff-form').reset();
+            }
+        }
+
+        /**
+         * Creates and saves a new staff profile to Firebase Realtime Database
+         */
+        function saveNewStaffProfile(e) {
+            e.preventDefault();
+
+            const usernameRaw = document.getElementById('add-staff-username').value.trim();
+            if (!usernameRaw) {
+                showToast("Username is required.", false);
+                return;
+            }
+
+            // Sanitize username into a valid Firebase key
+            const cleanKey = usernameRaw.toLowerCase().replace(/[.#$/[\]]/g, '_');
+
+            const newStaffData = {
+                name: document.getElementById('add-staff-name').value.trim(),
+                username: usernameRaw,
+                email: document.getElementById('add-staff-email').value.trim(),
+                role: document.getElementById('add-staff-role').value,
+                rate: document.getElementById('add-staff-rate').value.trim() || 'RM 14.50 / Hr',
+                outlet: document.getElementById('add-staff-outlet').value.trim() || 'Ampang Jaya Branch',
+                joinedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+            };
+
+            // Save to Firebase
+            if (typeof isFirebaseConnected !== 'undefined' && isFirebaseConnected && typeof db !== 'undefined') {
+                db.ref('users/' + cleanKey).set(newStaffData)
+                    .then(() => {
+                        showToast("New staff added to Firebase!", true);
+                        closeAddStaffModal();
+                    })
+                    .catch(err => {
+                        console.error("Firebase save error:", err);
+                        showToast("Failed to save to Firebase.", false);
+                    });
+            } else {
+                // Fallback for offline / local mode
+                if (typeof cachedStaffList !== 'undefined') {
+                    cachedStaffList[cleanKey] = newStaffData;
+                    if (typeof renderStaffCards === 'function') renderStaffCards(cachedStaffList);
+                }
+                showToast("New staff added locally!", true);
+                closeAddStaffModal();
+            }
+        }
+
+        /**
+         * Updates an existing staff profile in Firebase Realtime Database
+         */
+        function saveStaffProfileChanges(e) {
+            e.preventDefault();
+
+            // 1. Get the unique staff key from the hidden input field
+            const userKey = document.getElementById('edit-staff-key').value;
+
+            if (!userKey) {
+                showToast("Error: Missing staff key.", false);
+                return;
+            }
+
+            // 2. Gather updated field values from the form
+            const updatedData = {
+                name: document.getElementById('edit-staff-name').value.trim(),
+                username: document.getElementById('edit-staff-username').value.trim(),
+                email: document.getElementById('edit-staff-email').value.trim(),
+                role: document.getElementById('edit-staff-role').value,
+                rate: document.getElementById('edit-staff-rate').value.trim(),
+                outlet: document.getElementById('edit-staff-outlet').value.trim()
+            };
+
+            // 3. Write updates directly to Firebase
+            if (typeof isFirebaseConnected !== 'undefined' && isFirebaseConnected && typeof db !== 'undefined') {
+                db.ref('users/' + userKey).update(updatedData)
+                    .then(() => {
+                        showToast("Staff profile updated in Firebase!", true);
+                        closeEditStaffModal();
+                    })
+                    .catch(err => {
+                        console.error("Firebase update error:", err);
+                        showToast("Failed to update Firebase: " + err.message, false);
+                    });
+            } else {
+                // Fallback for offline / local mode
+                if (typeof cachedStaffList !== 'undefined' && cachedStaffList[userKey]) {
+                    cachedStaffList[userKey] = { ...cachedStaffList[userKey], ...updatedData };
+                    if (typeof renderStaffCards === 'function') renderStaffCards(cachedStaffList);
+                }
+                showToast("Profile updated locally!", true);
+                closeEditStaffModal();
+            }
+        }
+        // ==========================================
+        // DELETE STAFF LOGIC
+        // ==========================================
+
+        /**
+         * Deletes a staff record from Firebase or local cache
+         */
+        function deleteStaffProfile(userKey) {
+            const staff = cachedStaffList[userKey];
+            const staffName = staff ? (staff.name || staff.username) : userKey;
+
+            if (!confirm(`Are you sure you want to delete profile for "${staffName}"?`)) {
+                return;
+            }
+
+            if (isFirebaseConnected && db) {
+                db.ref('users/' + userKey).remove().then(() => {
+                    showToast("Staff profile deleted from Firebase!", true);
+                }).catch(err => {
+                    console.error("Firebase delete error:", err);
+                    showToast("Failed to delete staff profile.", false);
+                });
+            } else {
+                // Fallback local deletion
+                delete cachedStaffList[userKey];
+                renderStaffCards(cachedStaffList);
+                showToast("Staff profile deleted locally!", true);
+            }
+        }
+
+        function filterSalesReports() {
+            const body = document.getElementById('sales-report-body');
+            if (!body) return;
+
+            const mockSales = [
+                { date: '2026-08-01', orders: 142, total: '3,210.00' },
+                { date: '2026-08-02', orders: 189, total: '4,150.00' },
+                { date: '2026-08-03', orders: 165, total: '3,450.00' }
+            ];
+
+            body.innerHTML = mockSales.map(s => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px;">${s.date}</td>
+                    <td style="padding: 8px;">${s.orders}</td>
+                    <td style="padding: 8px; font-weight: 800;">RM ${s.total}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportSalesReport(type) {
+            if (type === 'excel') {
+                const data = [
+                    ["Date", "Orders", "Total Revenue (MYR)"],
+                    ["2026-08-01", 142, 3210.00],
+                    ["2026-08-02", 189, 4150.00],
+                    ["2026-08-03", 165, 3450.00]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sales Report");
+                XLSX.writeFile(wb, "Hemzal_Sales_Report.xlsx");
+                showToast("Excel Spreadsheet Exported!", true);
+            } else if (type === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text("Hemzal Crispy - Sales Analytics Report", 14, 15);
+                doc.autoTable({
+                    startY: 25,
+                    head: [['Date', 'Orders', 'Total Revenue (MYR)']],
+                    body: [
+                        ['2026-08-01', '142', 'RM 3,210.00'],
+                        ['2026-08-02', '189', 'RM 4,150.00'],
+                        ['2026-08-03', '165', 'RM 3,450.00']
+                    ]
+                });
+                doc.save("Hemzal_Sales_Report.pdf");
+                showToast("PDF Report Exported!", true);
+            }
+        }
+
+
+        /* ==================== APP INITIALIZATION ==================== */
+        document.addEventListener('DOMContentLoaded', () => {
             initPWAEngine();
             initFirebaseRTDB();
             startLiveClock();
-            if (typeof renderShiftLogs === 'function') renderShiftLogs();
-            
-            const today = new Date().toISOString().split('T')[0];
-            if(document.getElementById('start-date')) document.getElementById('start-date').value = today;
-            if(document.getElementById('end-date')) document.getElementById('end-date').value = today;
-            
-            startPromoCarousel();
-        }
+            initPromoSlider();
+            renderShiftLogs();
+            navigateTo('login-screen');
+        });
     </script>
 </body>
 </html>
